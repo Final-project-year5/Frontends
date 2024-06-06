@@ -51,16 +51,7 @@ export const aboutUs = [
         position: "Project Manager",
         image: user4,
       },
-      {
-        name: "Michael Wilson",
-        position: "Design Lead",
-        image: user5,
-      },
-      {
-        name: "Emily Davis",
-        position: "Marketing Head",
-        image: user6,
-      },
+      
     ],
   },
 ];

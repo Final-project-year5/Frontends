@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaEnvelope } from "react-icons/fa";
-import movingImage from "../../../assets/img/auth/class.jpg";
+import { useHistory } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ForgotPasswordProcess = () => {
+  const history = useHistory();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [verificationCode, setVerificationCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const validateEmail = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,7 +49,7 @@ const ForgotPasswordProcess = () => {
       }
     }
   };
-  
+
   const handleSubmitVerificationCode = async (e) => {
     e.preventDefault();
     try {
@@ -106,65 +110,74 @@ const ForgotPasswordProcess = () => {
             </button>
           </form>
         );
-        case 2:
-          return (
-            <form className="form" onSubmit={handleSubmitVerificationCode}>
-              <div className="flex flex-col">
-                {/* Verification code input */}
-                <div className="relative">
-                  <input
-                    id="verificationCode"
-                    type="text"
-                    placeholder=" "
-                    value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value)}
-                    className="registration-input text-white pl-4 mb-4 block w-full px-0 mt-3 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
-                    required
-                  />
-                  <label
-                    htmlFor="verificationCode"
-                    className={`absolute top-0 left-0 mt-2 ml-2 text-gray-400 ${
-                      verificationCode ? "hidden" : ""
-                    }`}
-                  >
-                    Enter verification code
-                  </label>
-                </div>
-                <div className="relative">
-                  <input
-                    id="newPassword"
-                    type="password"
-                    placeholder=" "
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className="registration-input text-white pl-4 mb-4 block w-full px-0 mt-3 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
-                    required
-                  />
-                  <label
-                    htmlFor="newPassword"
-                    className={`absolute top-0 left-0 mt-2 ml-2 text-gray-400 ${
-                      newPassword ? "hidden" : ""
-                    }`}
-                  >
-                    Enter new password
-                  </label>
-                </div>
-                <button
-                  className="button ml-12 mr-12 mt-4 rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500"
-                  type="submit"
-                >
-                  Reset Password
-                </button>
-              </div>
-            </form>
-          );
-      case 3:
+      case 2:
         return (
-          <div>
-            <p>Password successfully changed!</p>
-            {/* Redirect to login page */}
-          </div>
+          <form className="form" onSubmit={handleSubmitVerificationCode}>
+            <div className="flex flex-col">
+              {/* Verification code input */}
+              <div className="relative">
+                <input
+                  id="verificationCode"
+                  type="text"
+                  placeholder=" "
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value)}
+                  className="registration-input text-black pl-4 mb-4 block w-full px-0 mt-3 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
+                  required
+                />
+                <label
+                  htmlFor="verificationCode"
+                  className={`absolute top-0 left-0 mt-2 ml-2 text-gray-400 ${
+                    verificationCode ? "hidden" : ""
+                  }`}
+                >
+                  Enter verification code
+                </label>
+              </div>
+              <div className="relative">
+                <input
+                  id="newPassword"
+                  type="password"
+                  placeholder=" "
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="registration-input text-black pl-4 mb-4 block w-full px-0 mt-3 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-black border-gray-200"
+                  required
+                />
+                <label
+                  htmlFor="newPassword"
+                  className={`absolute top-0 left-0 mt-2 ml-2 text-gray-400 ${
+                    newPassword ? "hidden" : ""
+                  }`}
+                >
+                  Enter new password
+                </label>
+              </div>
+              <button
+                className="button ml-12 mr-12 mt-4 rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500"
+                type="submit"
+              >
+                Reset Password
+              </button>
+            </div>
+          </form>
         );
+        case 3:
+          // useEffect(() => {
+          //   const redirectTimer = setTimeout(() => {
+          //     history.push("/signin");
+          //   }, 5000);
+        
+          //   return () => clearTimeout(redirectTimer);
+          // }, []);
+        
+          return (
+            <div>
+              <p>Password successfully changed!</p>
+              <p>Redirecting to sign-in page...</p>
+            </div>
+          );
+        
       default:
         return null;
     }
@@ -172,27 +185,36 @@ const ForgotPasswordProcess = () => {
 
   return (
     <div
-      className="flex min-h-screen w-full items-center justify-center"
-      style={{
-        backgroundImage: `url(${movingImage})`,
-        backgroundSize: "cover",
-        backgroundRepeat: "no-repeat",
-      }}
+      className="min-h-screen flex items-center justify-center bg-gray-100"
+      
     >
-      <div className="flex flex-col justify-between h-full py-8">
-        <div
-          className="rounded-xl bg-gray-600 bg-opacity-50 px-16 w-96 py-10 shadow-lg backdrop-blur-md max-sm:px-8"
-          style={{ width: "500px" }}
-        >
-          <div className="text-white">
-            <div className="mb-8 flex flex-col items-center">
-              <h1 className="mb-2 text-blue-500 text-2xl font-bold">
-                Forgot Password
-              </h1>
-              <span className="text-gray-300">Recover your account</span>
+      <div className="bg-white shadow-lg rounded-lg overflow-hidden flex w-3/4">
+        <div className="w-1/3 text-white p-8" style={{ backgroundColor: "#6e82a7" }}>
+          <h1 className="text-2xl font-bold mb-4" style={{ color: "#d6eadf" }}>Forgot Password</h1>
+          <h2 className="text-xl mb-6 text-gray-200">Step {step}</h2>
+          <div className="space-y-4">
+            <div className="flex items-center">
+              <span className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: step === 1 ? "#95b8d1" : "#6e82a7" }}>1</span>
+              <span className="ml-4">Enter Email</span>
+            </div>
+            <div className="flex items-center">
+              <span className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-xl font-bold" style={{ backgroundColor: step === 2 ? "#95b8d1" : "#6e82a7" }}>2</span>
+              <span className="ml-4">Verify Email</span>
+            </div>
+          </div>
+        </div>
+        <div className="w-2/3 p-8">
+          <div className="mb-6">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 text-white rounded-full flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: "#92ADDF" }}>
+                A
+              </div>
+              <h2 className="ml-4 text-2xl font-bold">Recover your account</h2>
             </div>
             {renderStepForm()}
-            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
+            {errorMessage && (
+              <p className="text-red-500 text-sm">{errorMessage}</p>
+            )}
           </div>
         </div>
       </div>

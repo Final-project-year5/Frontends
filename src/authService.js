@@ -32,4 +32,6 @@ export const logout = () => {
   localStorage.removeItem('accessToken');
   // Remove the role from local storage
   localStorage.removeItem('role');
+  window.location.href = '/signin'; // Replace '/signin' with the actual URL of your sign-in page
+
 };

@@ -29,7 +29,7 @@ import Profile from "views/student/profile";
 import Studentcourse from "views/student/course";
 import studentschedule from "views/student/Schedule";
 import Permission from "views/admin/Permission";
-
+import Demopages from "./views/student/course/demo"
 import AttendanceReport from "views/student/AttendanceReport/AttendanceReport";
 import AdminHR from "views/admin/AdminHR/AdminHR";
 import PermissionPage from "views/student/PermissionPage/PermissionPage";
@@ -88,6 +88,14 @@ const routes = [
     ),
     component: () => <Course courses={tableData} />,
     allowedRoles: ["teacher"],
+  },
+  { 
+    name: "Dashboard",
+    layout: "/admin",
+    icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+    path: "/student-demo",
+    component: Demopages,
+    allowedRoles: ["student"],
   },
   {
     name: "Student Course",
@@ -177,6 +185,7 @@ const routes = [
     component: PermissionPage,
     allowedRoles: ["student"],
   },
+  
   {
     name: "Profile",
     layout: "/admin",
