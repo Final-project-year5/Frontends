@@ -25,8 +25,17 @@ const AdminHR = () => {
   }, []);
 
   const addTeacher = async (teacher) => {
+    const formData = new FormData();
+    Object.keys(teacher).forEach((key) => {
+      formData.append(key, teacher[key]);
+    });
+
     try {
-      const response = await axios.post('http://localhost:8000/api/add_teacher/', teacher);
+      const response = await axios.post('http://localhost:8000/api/add_teacher/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       setTeachers([...teachers, response.data]);
       setShowAddTeacherPopup(false); // Close the pop-up after adding teacher
     } catch (error) {
@@ -44,7 +53,7 @@ const AdminHR = () => {
       }
     }
   };
-  
+
   const editTeacher = async (id, updatedTeacher) => {
     try {
       await axios.put(`http://localhost:8000/api/edit_teacher/${id}/`, updatedTeacher);
@@ -119,12 +128,36 @@ const TeacherManagement = ({ teachers, deleteTeacher, editTeacher }) => {
 };
 
 const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [teacherData, setTeacherData] = useState({
+    name: '',
+    email: '',
+    phone_number: '',
+    gender: '',
+    department: '',
+    college: '',
+    qualifications: '',
+    semester: '',
+    profile_picture: null,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTeacherData({
+      ...teacherData,
+      [name]: value,
+    });
+  };
+
+  const handleFileChange = (e) => {
+    setTeacherData({
+      ...teacherData,
+      profile_picture: e.target.files[0],
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addTeacher({ name, email });
+    addTeacher(teacherData);
   };
 
   return (
@@ -132,16 +165,72 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
       <form onSubmit={handleSubmit}>
         <input 
           type="text" 
+          name="name"
           placeholder="Name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
+          value={teacherData.name} 
+          onChange={handleChange} 
           required 
         />
         <input 
           type="email" 
+          name="email"
           placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
+          value={teacherData.email} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="phone_number"
+          placeholder="Phone Number" 
+          value={teacherData.phone_number} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="gender"
+          placeholder="Gender" 
+          value={teacherData.gender} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="department"
+          placeholder="Department" 
+          value={teacherData.department} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="college"
+          placeholder="College" 
+          value={teacherData.college} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="qualifications"
+          placeholder="Qualifications" 
+          value={teacherData.qualifications} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="semester"
+          placeholder="Semester" 
+          value={teacherData.semester} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="file" 
+          name="profile_picture"
+          onChange={handleFileChange} 
           required 
         />
         <button type="submit">Add Teacher</button>
@@ -152,42 +241,3 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
 };
 
 export default AdminHR;
-
-
-
-// return (
-//   <div className="admin-hr-page">
-//     <div className="header">
-//       <div className="tab" onClick={() => handleTabChange('teacher')}>
-//         Teacher Management
-//       </div>
-//     </div>
-//     <div className="admin-hr-content">
-//       {/* Rendering of teacher management component */}
-//     </div>
-//     {showAddTeacherPopup && (
-//       <div className="overlay">
-//         <div className="add-teacher-popup">
-//           <h3>Add Teacher</h3>
-//           <input 
-//             type="text" 
-//             placeholder="Name" 
-//             value={newTeacher.name} 
-//             onChange={(e) => setNewTeacher({ ...newTeacher, name: e.target.value })} 
-//             required 
-//           />
-//           <input 
-//             type="email" 
-//             placeholder="Email" 
-//             value={newTeacher.email} 
-//             onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })} 
-//             required 
-//           />
-//           <button onClick={addTeacher}>Add Teacher</button>
-//           <button onClick={() => setShowAddTeacherPopup(false)}>Cancel</button>
-//         </div>
-//       </div>
-//     )}
-//     <button className="add-teacher-btn" onClick={() => setShowAddTeacherPopup(true)}>Add New Teacher</button>
-//   </div>
-// );

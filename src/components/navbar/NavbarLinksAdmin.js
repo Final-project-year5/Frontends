@@ -23,6 +23,7 @@ import { MdNotificationsNone } from "react-icons/md";
 import { FaEthereum } from "react-icons/fa";
 import routes from "routes.js";
 import { logout } from "../../authService";
+import { toast } from "react-toastify";
 
 export default function HeaderLinks(props) {
   const { secondary } = props;
@@ -41,9 +42,12 @@ export default function HeaderLinks(props) {
 
   const handleLogout = () => {
     logout();
+    // Show logout successful toast
+    toast.success("Logout successful!");
     // Redirect the user to the sign-in page
     window.location.href = "/signin";
   };
+  
 
   const [userName, setUserName] = useState(""); // State variable to store the user's name
   const [notifications, setNotifications] = useState([]);

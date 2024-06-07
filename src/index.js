@@ -29,15 +29,20 @@ import Login from "./views/auth/signIn/LoginForm";
 import ForgotPwd from "./views/auth/signIn/ForgotPasswordProcess";
 import ProfilePage from './views/student/profile/index';
 import TeacherCourseSelection from "./views/teacher/courses/components/TeacherCourseSelection";
-
+import Demopages from "./views/student/course/demo"
+import Calendar from 'react-calendar';
+import StudentPerformanceForm from './views/teacher/StudentPerformance/addPerformanceForm';
 
 
 ReactDOM.render(
   <ChakraProvider theme={theme}>
     <React.StrictMode>
       <ThemeEditorProvider>
+      <ToastContainer  position="top-center"
+ />
         <HashRouter>
           <Switch>
+
             <Route exact path="/" component={LandingPage} />
             <Route path={`/student`} component={StudentLayout} />
             <Route path={`/admin`} component={AdminLayout} />
@@ -46,6 +51,7 @@ ReactDOM.render(
             <RouteGuard path="/attendance-history" component={AttendanceHistory} allowedRoles={["teacher"]} />
             <RouteGuard path="/detailed-report/:id" component={DetailedReport} allowedRoles={["teacher"]} />
             <RouteGuard path="/student-permission" component={StudentPermission} allowedRoles={["student"]} />
+            <RouteGuard path="/student-demo" component={Demopages} allowedRoles={["student"]} />
             <RouteGuard path="/view-permission/:permissionId" component={ViewPermission} allowedRoles={["teacher"]} />
             <RouteGuard path="/course-management" component={CourseManagement} allowedRoles={["admin"]} />
             <RouteGuard path="/view-schedule" component={ViewSchedule} allowedRoles={["teacher"]} />
@@ -54,8 +60,12 @@ ReactDOM.render(
             <RouteGuard path="/profile-settings" component={() => (<AdminLayout><ProfilePage/></AdminLayout>
             )} allowedRoles={["teacher", "student", "admin"]} />
             <Route path="/signup" component={Register} />
+
+
+
             <Route path="/signin" component={Login} />
             <Route path="/forgotpwd" component={ForgotPwd} />
+            <Route path="/studentperformance" component={StudentPerformanceForm} />
             <RouteGuard path="/teacher-course-selection" component={TeacherCourseSelection} allowedRoles={["teacher"]} />
             <Redirect from='/' to='/admin' />
           </Switch>
