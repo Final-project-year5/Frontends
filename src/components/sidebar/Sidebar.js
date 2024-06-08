@@ -43,6 +43,7 @@ function Sidebar(props) {
       <Box
         bg={sidebarBg}
         transition={variantChange}
+        
         w='300px'
         h='100vh'
         m={sidebarMargins}

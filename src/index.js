@@ -31,7 +31,7 @@ import ProfilePage from './views/student/profile/index';
 import TeacherCourseSelection from "./views/teacher/courses/components/TeacherCourseSelection";
 import Demopages from "./views/student/course/demo"
 import Calendar from 'react-calendar';
-import StudentPerformanceForm from './views/teacher/StudentPerformance/addPerformanceForm';
+import StudentPerformanceForm from './views/teacher/StudentPerformance/viewPerformanceForm.jsx';
 
 
 ReactDOM.render(
@@ -65,7 +65,7 @@ ReactDOM.render(
 
             <Route path="/signin" component={Login} />
             <Route path="/forgotpwd" component={ForgotPwd} />
-            <Route path="/studentperformance" component={StudentPerformanceForm} />
+            <Route path="/studentperformance/:id/marks" component={StudentPerformanceForm} />
             <RouteGuard path="/teacher-course-selection" component={TeacherCourseSelection} allowedRoles={["teacher"]} />
             <Redirect from='/' to='/admin' />
           </Switch>

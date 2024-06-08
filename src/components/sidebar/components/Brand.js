@@ -13,7 +13,7 @@ export function SidebarBrand() {
 
   return (
     <Flex align='center' direction='column'>
-      <h1>AASTU ATTENDANCE</h1>
+      <h1 className="text-white text-2xl font-bold">AASTU ATTENDANCE</h1>
       <HSeparator mb='20px' />
     </Flex>
   );
