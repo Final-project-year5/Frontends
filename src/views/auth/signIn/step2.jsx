@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const StepTwoFields = ({
   college,
@@ -16,16 +17,9 @@ const StepTwoFields = ({
   const [departmentError, setDepartmentError] = useState("");
   const [sectionError, setSectionError] = useState("");
   const [yearSemesterError, setYearSemesterError] = useState("");
+  const [collegeOptions, setCollegeOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
 
-  // Define dropdown options for college and departments
-  const collegeOptions = ["College A", "College B", "College C"]; // Example options
-  const departmentOptions = {
-    "College A": ["Department 1", "Department 2", "Department 3"],
-    "College B": ["Department 4", "Department 5", "Department 6"],
-    "College C": ["Department 7", "Department 8", "Department 9"],
-  };
-
-  // Define year semester options
   const yearSemesterOptions = [
     "1st year 1st semester",
     "1st year 2nd semester",
@@ -47,7 +41,7 @@ const StepTwoFields = ({
   };
 
   const validateDepartment = () => {
-    if (!department.trim()) {
+    if (!department) {
       return "Department is required";
     }
     return "";
@@ -67,39 +61,56 @@ const StepTwoFields = ({
     return "";
   };
 
-  const handleNext = (e) => {
-    e.preventDefault();
+  const handleNext = async (e) => {
+  e.preventDefault();
 
-    const collegeError = validateCollege();
-    const departmentError = validateDepartment();
-    const sectionError = validateSection();
-    const yearSemesterError = validateYearSemester();
+  const collegeError = validateCollege();
+  const departmentError = validateDepartment();
+  const sectionError = validateSection();
+  const yearSemesterError = validateYearSemester();
 
-    if (collegeError || departmentError || sectionError || yearSemesterError) {
-      setCollegeError(collegeError);
-      setDepartmentError(departmentError);
-      setSectionError(sectionError);
-      setYearSemesterError(yearSemesterError);
-      return;
-    }
+  setCollegeError(collegeError);
+  setDepartmentError(departmentError);
+  setSectionError(sectionError);
+  setYearSemesterError(yearSemesterError);
 
-    // Store form data in sessionStorage
+  if (collegeError || departmentError || sectionError || yearSemesterError) {
+    return;
+  }
+
+  try {
     const formData = {
       college,
-      department,
+      department: department ? department.id : '', // Department instance or ''
       section,
       yearSemester,
     };
     sessionStorage.setItem("formData", JSON.stringify(formData));
 
-    onNext(college,
-        department,
-        section,
-        yearSemester);
-  };
+    onNext(college, department, section, yearSemester);
+  } catch (error) {
+    console.error("Error handling form submission:", error);
+    // Handle error
+  }
+};
+
+  
 
   useEffect(() => {
-    // Retrieve form data from sessionStorage on component mount
+    axios.get("http://localhost:8000/api/colleges/")
+      .then((response) => setCollegeOptions(response.data))
+      .catch((error) => console.error("Error fetching colleges:", error));
+  }, []);
+
+  useEffect(() => {
+    if (college) {
+      axios.get(`http://localhost:8000/api/departments/${college}/`)
+        .then((response) => setDepartmentOptions(response.data))
+        .catch((error) => console.error("Error fetching departments:", error));
+    }
+  }, [college]);
+
+  useEffect(() => {
     const storedFormData = JSON.parse(sessionStorage.getItem("formData"));
     if (storedFormData) {
       setCollege(storedFormData.college);
@@ -108,6 +119,7 @@ const StepTwoFields = ({
       setYearSemester(storedFormData.yearSemester);
     }
   }, []);
+
 
   return (
     <form className="space-y-4">
@@ -122,9 +134,9 @@ const StepTwoFields = ({
           className="border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="">Select College</option>
-          {collegeOptions.map((option, index) => (
-            <option key={index} value={option}>
-              {option}
+          {collegeOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.name}
             </option>
           ))}
         </select>
@@ -141,12 +153,11 @@ const StepTwoFields = ({
           className="border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
         >
           <option value="">Select Department</option>
-          {departmentOptions[college] &&
-            departmentOptions[college].map((option, index) => (
-              <option key={index} value={option}>
-                {option}
-              </option>
-            ))}
+          {departmentOptions.map((option, index) => (
+            <option key={index} value={option}>
+              {option}
+            </option>
+          ))}
         </select>
         {departmentError && (
           <p className="text-red-500 text-sm">{departmentError}</p>
