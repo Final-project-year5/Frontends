@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
-import movingImage from "../../../assets/img/auth/class.jpg";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -151,23 +150,6 @@ const LoginForm = () => {
       toast.error("Login failed. Please try again later.");
     }
   };
-  
-
-  const startCamera = () => {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((stream) => {
-        videoRef.current.srcObject = stream;
-      })
-      .catch((error) =>
-        console.error("Error accessing media devices: ", error)
-      );
-  };
-
-  const handleCameraToggle = () => {
-    setShowCamera(true);
-    startCamera();
-  };
 
   const handlePictureChange = async () => {
     try {
@@ -178,13 +160,41 @@ const LoginForm = () => {
       const mediaStream = videoRef.current.srcObject;
       const videoTrack = mediaStream.getVideoTracks()[0];
       const imageCapture = new ImageCapture(videoTrack);
-
+  
       const blob = await imageCapture.takePhoto();
-      const imageUrl = URL.createObjectURL(blob);
-      setCapturedImage(imageUrl);
-      setShowCamera(false);
+      const formData = new FormData();
+      formData.append("image", blob);
+  
+      const response = await fetch("http://localhost:8000/api/face-login/", {
+        method: "POST",
+        body: formData,
+      });
+  
+      const responseData = await response.json();
+  
+      if (response.ok) {
+        setShowCamera(false);
+        stopVideo();
+        localStorage.setItem("accessToken", responseData.access_token);
+        localStorage.setItem("role", JSON.stringify(responseData.role));
+        const userRole = responseData.role;
+        if (userRole === "admin") {
+          history.push(`/admin`);
+        } else if (userRole === "teacher") {
+          history.push(`/teacher`);
+        } else if (userRole === "student") {
+          history.push(`/student`);
+        } else {
+          console.error("Unknown user role:", userRole);
+        }
+        toast.success("Login successful");
+      } else {
+        setLoginStatus("invalid");
+        toast.error("Login failed. Please try again.");
+      }
     } catch (error) {
       console.error("Error capturing picture:", error);
+      toast.error("Error capturing picture. Please try again.");
     }
   };
 
@@ -297,16 +307,9 @@ const LoginForm = () => {
                   >
                     Take Picture
                   </button>
-                 
                 )}
-                
               </div>
             )}
-            {/* {loginStatus === "invalid" && (
-              <div className="mt-4 text-red-500 text-sm">
-                Invalid email, ID, or password.
-              </div>
-            )} */}    
           </div>
           <p className="text-center font-bold text-blue-300">
               Don't have an account?{" "}

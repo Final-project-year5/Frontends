@@ -1,21 +1,15 @@
+// StepFourFields.jsx
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const StepFourFields = ({
-  cachedData,
-  onPrevious,
-  onSubmit,
-}) => {
-  const [imageSrc, setImageSrc] = useState(null);
-  const history = useHistory();
+const StepFourFields = ({ cachedData, onPrevious, onSubmit }) => {
   const [picture, setPicture] = useState(null);
   const [showCamera, setShowCamera] = useState(false);
   const [videoStream, setVideoStream] = useState(null);
   const videoRef = useRef(null);
   const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (showCamera) {
@@ -27,10 +21,6 @@ const StepFourFields = ({
       stopVideo();
     };
   }, [showCamera]);
-
-  useEffect(() => {
-    console.log("Picture state:", picture);
-  }, [picture]);
 
   const startVideo = async () => {
     try {
@@ -47,16 +37,9 @@ const StepFourFields = ({
 
   const stopVideo = () => {
     if (videoStream) {
-      videoStream.getTracks().forEach((track) => {
-        track.stop();
-      });
+      videoStream.getTracks().forEach((track) => track.stop());
       setVideoStream(null);
     }
-  };
-
-  const handlePrevious = (e) => {
-    e.preventDefault();
-    onPrevious();
   };
 
   const handlePictureChange = async () => {
@@ -68,16 +51,12 @@ const StepFourFields = ({
       const mediaStream = videoRef.current.srcObject;
       const videoTrack = mediaStream.getVideoTracks()[0];
       const imageCapture = new ImageCapture(videoTrack);
-
       const blob = await imageCapture.takePhoto();
-      const file = new File([blob], "profile_picture.jpg", {
-        type: "image/jpeg",
-      });
-
-      setPicture(file); // Update the picture state
-      setShowCamera(false); // Hide the camera
-      console.log("Picture state:", picture); // Verify picture state after setting it
-      stopVideo(); // Stop the camera
+      console.log("blob", blob);
+      const file = new File([blob], "profile_picture.jpg", { type: "image/jpeg" });
+      setPicture(file);
+      setShowCamera(false);
+      stopVideo();
     } catch (error) {
       console.error("Error capturing picture:", error);
     }
@@ -85,8 +64,6 @@ const StepFourFields = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Check if cachedData and fullname exist
     if (!cachedData || !cachedData.fullname) {
       setErrorMessage("Cached data is missing or incomplete.");
       return;
@@ -103,9 +80,6 @@ const StepFourFields = ({
     formData.append("phoneNumber", cachedData.phoneNumber);
     formData.append("password", cachedData.password);
     formData.append("confirmPassword", cachedData.confirmPassword);
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);}
-    // Check if a picture has been taken
     if (picture) {
       formData.append("face_image", picture);
     } else {
@@ -114,7 +88,7 @@ const StepFourFields = ({
     }
 
     try {
-      // Replace the URL with your actual backend endpoint
+      console.log(formData);
       await axios.post("http://localhost:8000/api/register/", formData);
       toast.success("Form submitted successfully!");
       window.location.href = "/signin";
@@ -123,14 +97,11 @@ const StepFourFields = ({
       console.error("Error submitting form:", error);
       toast.error("Failed to submit the form. Please try again.");
     }
-    
   };
 
   return (
-    <form className="space-y-4">
-      <div className="text-gray-600">
-        Take your picture in clear light and show your full face.
-      </div>
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      <div className="text-gray-600">Take your picture in clear light and show your full face.</div>
       {picture && (
         <div>
           <h2 className="text-lg font-medium">Taken Picture</h2>
@@ -138,44 +109,27 @@ const StepFourFields = ({
         </div>
       )}
       {!showCamera && (
-        <button
-          type="button"
-          onClick={() => setShowCamera(true)}
-          className="open-camera-button rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500"
-        >
+        <button type="button" onClick={() => setShowCamera(true)} className="open-camera-button rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500">
           Open Camera
         </button>
       )}
       {showCamera && (
         <div className="camera-container">
           <video ref={videoRef} className="camera-feed" autoPlay />
-          <button
-            type="button"
-            onClick={handlePictureChange}
-            className="take-picture-button ml-64 mt-4 rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500"
-          >
+          <button type="button" onClick={handlePictureChange} className="take-picture-button ml-64 mt-4 rounded-lg bg-blue-500 text-white px-4 py-1 transition-colors duration-300 hover:bg-transparent hover:text-blue-500">
             Take Picture
           </button>
         </div>
       )}
       <div className="flex justify-between mt-4">
-        <button
-          onClick={handlePrevious}
-          className="text-white py-2 px-4 rounded hover:bg-teal-600"
-          style={{ backgroundColor: "#95b8d1" }}
-        >
+        <button onClick={onPrevious} className="text-white py-2 px-4 rounded hover:bg-teal-600" style={{ backgroundColor: "#95b8d1" }}>
           Previous
         </button>
-        <button
-          onClick={handleSubmit}
-          className="text-white py-2 px-4 rounded hover:bg-teal-600"
-          style={{ backgroundColor: "#95b8d1" }}
-        >
+        <button type="submit" className="text-white py-2 px-4 rounded hover:bg-teal-600" style={{ backgroundColor: "#95b8d1" }}>
           Submit
         </button>
       </div>
       {errorMessage && <div className="text-red-500">{errorMessage}</div>}
-      {successMessage && <div className="text-green-500">{successMessage}</div>}
     </form>
   );
 };

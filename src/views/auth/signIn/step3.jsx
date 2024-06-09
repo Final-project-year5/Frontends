@@ -18,7 +18,7 @@ const StepThreeFields = ({
     if (!phoneNumber.trim()) {
       return "Phone Number is required";
     }
-    const phoneRegex = /^097\d{7}$/; // Phone number format: 0977654321
+    const phoneRegex = /^09\d{8}$/ ;// /^097\d{7}$/; // Phone number format: 0977654321
     if (!phoneRegex.test(phoneNumber.trim())) {
       return "Invalid Phone Number format. It should be in the format 0977654321.";
     }
