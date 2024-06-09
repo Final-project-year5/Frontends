@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import './AdminHR.css';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const AdminHR = () => {
-  const [activeTab, setActiveTab] = useState('teacher');
+  const [activeTab, setActiveTab] = useState("teacher");
   const [teachers, setTeachers] = useState([]);
   const [showAddTeacherPopup, setShowAddTeacherPopup] = useState(false);
+  const [editingId, setEditingId] = useState(null); // Define editingId state
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -13,10 +13,10 @@ const AdminHR = () => {
 
   const fetchTeachers = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/teachers/');
+      const response = await axios.get("http://localhost:8000/api/teachers/");
       setTeachers(response.data);
     } catch (error) {
-      console.error('Error fetching teachers:', error.message);
+      console.error("Error fetching teachers:", error.message);
     }
   };
 
@@ -31,15 +31,19 @@ const AdminHR = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:8000/api/add_teacher/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/add_teacher/",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
       setTeachers([...teachers, response.data]);
       setShowAddTeacherPopup(false); // Close the pop-up after adding teacher
     } catch (error) {
-      console.error('Error adding teacher:', error.message);
+      console.error("Error adding teacher:", error.message);
     }
   };
 
@@ -50,7 +54,7 @@ const AdminHR = () => {
         await axios.delete(`http://localhost:8000/api/delete_teacher/${id}/`);
         setTeachers(prevTeachers => prevTeachers.filter(teacher => teacher.id !== id));
       } catch (error) {
-        console.error('Error deleting teacher:', error.message);
+        console.error("Error deleting teacher:", error.message);
       }
     }
   };
@@ -61,24 +65,39 @@ const AdminHR = () => {
       const response = await axios.put(`http://localhost:8000/api/edit_teacher/${id}/`, updatedTeacher);
       setTeachers(prevTeachers => prevTeachers.map(teacher => (teacher.id === id ? response.data : teacher)));
     } catch (error) {
-      console.error('Error editing teacher:', error.message);
+      console.error("Error editing teacher:", error.message);
     }
   };
 
   return (
-    <div className="admin-hr-page">
-      <div className="header">
-        <div className="tab" onClick={() => handleTabChange('teacher')}>
-          Teacher Management
+    <div className="p-6 font-sans mt-24">
+      <div className="flex justify-between items-center mb-6">
+          <div className="flex justify-end flex-grow">
+            <button
+              className="bg-blue-500 text-white border-none py-2 px-4 rounded cursor-pointer hover:bg-blue-700"
+              style={{ backgroundColor: "#95b8d1" }} // Set button color
+              onClick={() => setShowAddTeacherPopup(true)}
+            >
+              Add New Teacher
+            </button>
         </div>
       </div>
-      <div className="admin-hr-content">
-        {activeTab === 'teacher' ? (
-          <TeacherManagement teachers={teachers} deleteTeacher={deleteTeacher} editTeacher={editTeacher} />
+
+      <div>
+        {activeTab === "teacher" ? (
+          <TeacherManagement
+            teachers={teachers}
+            deleteTeacher={deleteTeacher}
+            editTeacher={editTeacher}
+          />
         ) : null}
       </div>
-      {showAddTeacherPopup && <AddTeacherPopup addTeacher={addTeacher} setShowAddTeacherPopup={setShowAddTeacherPopup} />}
-      <button className="add-teacher-btn" onClick={() => setShowAddTeacherPopup(true)}>Add New Teacher</button>
+      {showAddTeacherPopup && (
+        <AddTeacherPopup
+          addTeacher={addTeacher}
+          setShowAddTeacherPopup={setShowAddTeacherPopup}
+        />
+      )}
     </div>
   );
 };
@@ -109,14 +128,15 @@ const TeacherManagement = ({ teachers, deleteTeacher, editTeacher }) => {
   };
 
   return (
-    <div className="teacher-management">
-      <h3>List of Teachers</h3>
-      <table>
+  <div>
+    <h3 className="text-lg font-semibold mb-4">List of Teachers</h3>
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
         <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Actions</th>
+          <tr className="bg-blue-gray-50">
+            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Name</th>
+            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Email</th>
+            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -171,19 +191,21 @@ const TeacherManagement = ({ teachers, deleteTeacher, editTeacher }) => {
         </tbody>
       </table>
     </div>
-  );
+  </div>
+);
+
 };
 
 const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
   const [teacherData, setTeacherData] = useState({
-    name: '',
-    email: '',
-    phone_number: '',
-    gender: '',
-    department: '',
-    college: '',
-    qualifications: '',
-    semester: '',
+    name: "",
+    email: "",
+    phone_number: "",
+    gender: "",
+    department: "",
+    college: "",
+    qualifications: "",
+    semester: "",
     profile_picture: null,
   });
 

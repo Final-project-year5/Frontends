@@ -2,19 +2,24 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 // chakra imports
-import { Box, Flex, HStack, Text, useColorModeValue } from "@chakra-ui/react";
-import { isAuthenticated, getUserRole } from 'authService';
+import { isAuthenticated, getUserRole } from "authService";
+import {
+  Box,
+  Flex,
+  HStack,
+  Text,
+  useColorModeValue,
+  Divider,
+} from "@chakra-ui/react";
+import { HSeparator } from "components/separator/Separator";
 
 export function SidebarLinks(props) {
   //   Chakra color mode
   let location = useLocation();
-  let activeColor = useColorModeValue("gray.700", "white");
-  let inactiveColor = useColorModeValue(
-    "secondaryGray.600",
-    "secondaryGray.600"
-  );
-  let activeIcon = useColorModeValue("brand.500", "white");
-  let textColor = useColorModeValue("secondaryGray.500", "white");
+  let activeColor = useColorModeValue("#95b8d1", "white");
+  let inactiveColor = useColorModeValue("white", "white");
+  let activeIcon = useColorModeValue("#95b8d1", "white");
+  let textColor = useColorModeValue("secondaryGray.100", "white");
   let brandColor = useColorModeValue("brand.500", "brand.400");
 
   const { routes } = props;
@@ -50,14 +55,15 @@ export function SidebarLinks(props) {
             <Text
               fontSize={"md"}
               color={activeColor}
-              fontWeight='bold'
-              mx='auto'
+              fontWeight="bold"
+              mx="auto"
               ps={{
                 sm: "10px",
                 xl: "16px",
               }}
-              pt='18px'
-              pb='12px'>
+              pt="18px"
+              pb="12px"
+            >
               {route.name}
             </Text>
             {createLinks(route.items)}
@@ -72,20 +78,28 @@ export function SidebarLinks(props) {
                   spacing={
                     activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
                   }
-                  py='5px'
-                  ps='10px'>
-                  <Flex w='100%' alignItems='center' justifyContent='center'>
+                  py="5px"
+                  ps="10px"
+                >
+                  <Flex
+                    w="100%"
+                    alignItems="center"
+                    justifyContent="center"
+                    marginTop="10px"
+                    marginBottom="10px"
+                  >
                     <Box
                       color={
                         activeRoute(route.path.toLowerCase())
                           ? activeIcon
                           : textColor
                       }
-                      me='18px'>
+                      me="18px"
+                    >
                       {route.icon}
                     </Box>
                     <Text
-                      me='auto'
+                      me="auto"
                       color={
                         activeRoute(route.path.toLowerCase())
                           ? activeColor
@@ -95,19 +109,21 @@ export function SidebarLinks(props) {
                         activeRoute(route.path.toLowerCase())
                           ? "bold"
                           : "normal"
-                      }>
+                      }
+                    >
                       {route.name}
                     </Text>
                   </Flex>
+
                   <Box
-                    h='36px'
-                    w='4px'
+                    h="36px"
+                    w="4px"
                     bg={
                       activeRoute(route.path.toLowerCase())
                         ? brandColor
                         : "transparent"
                     }
-                    borderRadius='5px'
+                    borderRadius="5px"
                   />
                 </HStack>
               </Box>
@@ -117,10 +133,11 @@ export function SidebarLinks(props) {
                   spacing={
                     activeRoute(route.path.toLowerCase()) ? "22px" : "26px"
                   }
-                  py='5px'
-                  ps='10px'>
+                  py="5px"
+                  ps="10px"
+                >
                   <Text
-                    me='auto'
+                    me="auto"
                     color={
                       activeRoute(route.path.toLowerCase())
                         ? activeColor
@@ -128,13 +145,15 @@ export function SidebarLinks(props) {
                     }
                     fontWeight={
                       activeRoute(route.path.toLowerCase()) ? "bold" : "normal"
-                    }>
+                    }
+                  >
                     {route.name}
                   </Text>
-                  <Box h='36px' w='4px' bg='brand.400' borderRadius='5px' />
+                  <Box h="36px" w="4px" bg="brand.400" borderRadius="5px" />
                 </HStack>
               </Box>
             )}
+            {/* <hr bg='rgba(135, 140, 189, 0.3)'/>{" "} */}
           </NavLink>
         );
       } else {

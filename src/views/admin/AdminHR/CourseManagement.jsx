@@ -136,9 +136,9 @@ const CourseManagement = (props) => {
               />
             </Box>
           </Portal>
-          <div className='course-management-page'>
+          <div className='course-management-page '>
             <h2>Course Management</h2>
-            <div className='add-course-form'>
+            <div className='add-course-form mt-8'>
               <input
                 type='text'
                 value={college}

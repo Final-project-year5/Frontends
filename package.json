@@ -17,6 +17,7 @@
     "@headlessui/react": "^1.4.0",
     "@heroicons/react": "^1.0.6",
     "@hypertheme-editor/chakra-ui": "^0.1.5",
+    "@mui/material": "^5.15.19",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
