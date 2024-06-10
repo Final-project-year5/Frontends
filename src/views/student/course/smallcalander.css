@@ -1,0 +1,85 @@
+/* Calendar.css */
+.calendar {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial, sans-serif';
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .col {
+    flex: 1;
+    text-align: center;
+    padding: 5px 0;
+  }
+  
+  .col-start {
+    text-align: left;
+  }
+  
+  .col-end {
+    text-align: right;
+  }
+  
+  .col-center {
+    text-align: center;
+  }
+  
+  .icon {
+    cursor: pointer;
+    font-size: 20px;
+  }
+  
+  .days {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+  }
+  
+  .cell {
+    padding: 10px 0;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border-radius: 50%;
+  }
+  
+  .cell:hover {
+    background: #f0f0f0;
+  }
+  
+  .disabled {
+    color: #ddd;
+    pointer-events: none;
+  }
+  
+  .selected {
+    background: #6c63ff;
+    color: white;
+  }
+  
+  .number {
+    font-size: 16px;
+    display: block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 auto;
+    border-radius: 50%;
+  }
+  
+  .body {
+    margin-top: 10px;
+  }
+  

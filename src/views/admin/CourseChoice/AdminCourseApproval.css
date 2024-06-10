@@ -44,8 +44,8 @@ td {
 th {
   position: sticky;
   top: 0;
-  background: #009879;
-  color: #ffffff;
+  background: #b8e0d2;
+  color: #6e82a7;
 }
 
 /* Add some padding to the table container */
@@ -70,17 +70,18 @@ th {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+  color: #FFFFFF
 }
 
 .action-button:hover {
-  background-color: #009879;
-  color: #ffffff;
+  background-color: #b8e0d2;
+  color: #0b0101;
 }
 
 .action-button.approve {
-  background-color: #3cb371;
+  background-color: #b8e0d2;
 }
 
 .action-button.reject {
-  background-color: #ff6347;
+  background-color: #d18787;
 }

@@ -1,8 +1,8 @@
 /* src/views/teacher/TeacherCourseSelection.css */
 
 .course-selection-container {
-  max-width: 500px;
-  margin: 2rem auto;
+  max-width: 700px;
+  /* margin: 2rem auto; */
   padding: 2rem;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
@@ -14,7 +14,7 @@
   text-align: center;
   font-size: 1.75rem;
   margin-bottom: 1.5rem;
-  color: #2d3748;
+  color: #6e82a7;
 }
 
 .course-checkbox {
@@ -22,7 +22,8 @@
   padding: 1rem 1.5rem; /* Increased padding */
   border: 1px solid #cbd5e0; /* Light gray border */
   border-radius: 8px;
-  background-color: #edf2f7; /* Light gray background */
+  background-color: #edf2f7;
+  border-color:#95b8d1; /* Light gray background */
   color: #4a5568;
   transition: background-color 0.3s ease;
 }
@@ -42,7 +43,7 @@
   padding: 0.75rem;
   font-size: 1rem;
   color: #ffffff;
-  background-color: #4a90e2; /* Blue button */
+  background-color: #6da9d4; /* Blue button */
   border: none;
   border-radius: 8px;
   cursor: pointer;
