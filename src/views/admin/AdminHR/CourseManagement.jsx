@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './CourseManagement.css';
+// import './CourseManagement.css';
 import Sidebar from '../../../components/sidebar/Sidebar';
 import { SidebarContext } from '../../../contexts/SidebarContext';
 import { Portal, Box, useDisclosure } from '@chakra-ui/react';
@@ -136,9 +136,9 @@ const CourseManagement = (props) => {
               />
             </Box>
           </Portal>
-          <div className='course-management-page '>
+          <div className='course-management-page ' style={{ marginTop: '55px' }}>
             <h2>Course Management</h2>
-            <div className='add-course-form mt-8'>
+            <div className='add-course-form '>
               <input
                 type='text'
                 value={college}
@@ -167,30 +167,34 @@ const CourseManagement = (props) => {
                 placeholder='Course Code'
                 className='course-code-input'
               />
-              <button onClick={addCourse} className='add-course-button'>
+              <button onClick={addCourse} marginTop='55px' className='add-course-button'>
                 Add Course
               </button>
             </div>
-            <table className='course-list-table'>
-              <thead>
-                <tr>
-                  <th className='college-column'>College</th>
-                  <th className='department-column'>Department</th>
-                  <th className='course-name-column'>Course Name</th>
-                  <th className='course-code-column'>Course Code</th>
-                </tr>
-              </thead>
-              <tbody>
-                {courses.map((course, index) => (
-                  <tr key={index} className='course-row'>
-                    <td className='college-cell'>{course.college}</td>
-                    <td className='department-cell'>{course.department}</td>
-                    <td className='course-name-cell'>{course.name}</td>
-                    <td className='course-code-cell'>{course.code}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
+              <div class="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+                <table class="min-w-full">
+                  <thead>
+                    <tr>
+                      <th class="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">College</th>
+                      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Department</th>
+                      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Course Name</th>
+                      <th class="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-blue-500 tracking-wider">Course Code</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white">
+                    {courses.map((course, index) => (
+                      <tr key={index} className='course-row'>
+                        <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-500'>{course.college}</td>
+                        <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-500'>{course.department}</td>
+                        <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-500'>{course.name}</td>
+                        <td className='px-6 py-4 whitespace-no-wrap border-b border-gray-500'>{course.code}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </Box>
       </Box>

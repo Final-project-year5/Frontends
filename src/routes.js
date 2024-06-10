@@ -75,6 +75,14 @@ const routes = [
     allowedRoles: ["admin"],
   },
   {
+    name: "Main Dashboard",
+    layout: "/admin",
+    path: "/default",
+    icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
+    // component: MainDashboard,
+    allowedRoles: ["teacher"],
+  },
+  {
     name: "Course",
     layout: "/admin",
     path: "/Course",

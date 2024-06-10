@@ -19,10 +19,11 @@ body {
 .add-course-btn {
   display: inline-block;
   padding: 10px 20px;
+  margin-top: 55px;
   margin-bottom: 20px;
   font-size: 16px;
   color: #fff;
-  background-color: #28a745;
+  background-color: #6e82a7;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -30,7 +31,7 @@ body {
 }
 
 .add-course-btn:hover {
-  background-color: #218838;
+  background-color: #6e82a7;
 }
 
 h3 {
@@ -65,7 +66,7 @@ table th {
 }
 
 .edit-btn {
-  background-color: #007bff;
+  background-color: #95b8d1;
   color: #fff;
 }
 
@@ -74,7 +75,7 @@ table th {
 }
 
 .delete-btn {
-  background-color: #dc3545;
+  background-color: #d18787;
   color: #fff;
 }
 
@@ -83,12 +84,12 @@ table th {
 }
 
 .save-btn {
-  background-color: #28a745;
+  background-color: #6e82a7;
   color: #fff;
 }
 
 .save-btn:hover {
-  background-color: #218838;
+  background-color: #213088;
 }
 
 .cancel-btn {

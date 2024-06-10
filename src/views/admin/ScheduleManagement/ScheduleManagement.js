@@ -69,7 +69,7 @@ const ScheduleManagement = () => {
   
     return (
       <div
-        className="bg-gray-100 p-8 rounded-lg shadow-md text-center"
+        className="bg-gray-100 p-8 rounded-lg shadow-md text-center mt-32"
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
