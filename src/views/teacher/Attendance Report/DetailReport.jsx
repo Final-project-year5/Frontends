@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import { SidebarContext } from "../../../contexts/SidebarContext";
 import routes from "routes.js";
+
 import { useHistory } from "react-router-dom";
 import {
   Portal,
@@ -254,6 +255,35 @@ const DetailReport = (props) => {
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
 
+  const exportAttendanceExcel = () => {
+    fetch("http://localhost:8000/api/export-attendance-excel")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.blob(); // Get the response body as a Blob
+      })
+      .then((blob) => {
+        // Create a URL for the Blob object
+        const url = window.URL.createObjectURL(blob);
+        // Create a link element
+        const link = document.createElement("a");
+        // Set the href attribute of the link to the Blob URL
+        link.href = url;
+        // Set the download attribute to specify the filename
+        link.download = "attendance.xls";
+        // Append the link to the document body
+        document.body.appendChild(link);
+        // Click the link to trigger the download
+        link.click();
+        // Remove the link from the document body
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error("Error:", error);
+      });
+  };
   return (
     <Box marginRight="10">
       <Box>
@@ -304,7 +334,17 @@ const DetailReport = (props) => {
             <hr className="flex-grow border-gray-300" />
           </div>
           <div className="mt-8 overflow-x-auto">
-            <h2 className="text-lg font-bold mb-2">Student List</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold mb-2">Student List</h2>
+              <button
+                className="px-2 py-2 border rounded-md font-semibold"
+                style={{ backgroundColor: "#6e82a7", color: "#FFFFFF" }}
+                onClick={exportAttendanceExcel}
+              >
+                Export Attendance to Excel
+              </button>
+            </div>
+
             <p className="text-xs text-gray-500 mt-2">
               Recorded time: {new Date().toLocaleTimeString()}
             </p>

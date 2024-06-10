@@ -37,7 +37,7 @@ const AdminCourseApproval = () => {
   };
 
   return (
-    <div className="table-container">
+    <div className="table-container mt-32">
       <table>
         <thead>
           <tr>

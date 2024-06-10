@@ -5,7 +5,7 @@ import React from "react";
 
 export default function ActivityLog({ roles }) {
   return (
-    <Box pt={{ base: "130px", md: "80px", xl: "80px" }}>
+    <Box  marginTop={{ base: "40px", md: "50px", xl: "60px" }} pt={{ base: "130px", md: "80px", xl: "80px" }}>
       {roles.length === 0 ? (
         <Text>No roles.</Text>
       ) : (

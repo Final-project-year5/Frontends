@@ -38,8 +38,7 @@ ReactDOM.render(
   <ChakraProvider theme={theme}>
     <React.StrictMode>
       <ThemeEditorProvider>
-      <ToastContainer  position="top-center"
- />
+      <ToastContainer  position="top-center"/>
         <HashRouter>
           <Switch>
 
@@ -60,8 +59,6 @@ ReactDOM.render(
             <RouteGuard path="/profile-settings" component={() => (<AdminLayout><ProfilePage/></AdminLayout>
             )} allowedRoles={["teacher", "student", "admin"]} />
             <Route path="/signup" component={Register} />
-
-
 
             <Route path="/signin" component={Login} />
             <Route path="/forgotpwd" component={ForgotPwd} />
