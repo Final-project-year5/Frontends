@@ -13,8 +13,8 @@ import RouteGuard from './RouteGuard';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewCoursePage from "./views/teacher/courses/components/view";
-import {tableData} from "views/teacher/courses/variables/tableData";
-import {studentData} from "views/teacher/courses/variables/studentData";
+// import {tableData} from "views/teacher/courses/variables/tableData";
+// import {studentData} from "views/teacher/courses/variables/studentData";
 import AttendanceHistory from "./views/teacher/Attendance Report/AttendanceHistory";
 import DetailedReport from "./views/teacher/Attendance Report/DetailReport";
 import StudentPermission from "./views/teacher/StudentPemission/StudentPermission";
@@ -47,7 +47,7 @@ ReactDOM.render(
             <Route path={`/student`} component={StudentLayout} />
             <Route path={`/admin`} component={AdminLayout} />
             <Route path={`/teacher`} component={TeacherLayout} />
-            <RouteGuard path="/courses/:index" component={(props) => <ViewCoursePage {...props} tableData={tableData} students={studentData} />} allowedRoles={["teacher"]} />
+            <RouteGuard path="/courses/:id" component={(props) => <ViewCoursePage {...props} />} allowedRoles={["teacher"]} />
             <RouteGuard path="/attendance-history" component={AttendanceHistory} allowedRoles={["teacher"]} />
             <RouteGuard path="/detailed-report/:id" component={DetailedReport} allowedRoles={["teacher"]} />
             <RouteGuard path="/student-permission" component={StudentPermission} allowedRoles={["student"]} />

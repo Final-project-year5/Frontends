@@ -122,65 +122,115 @@ const TeacherManagement = ({ teachers, deleteTeacher, editTeacher }) => {
     });
   };
 
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    total_pages: 3, // Example: total pages
+    total_results: 2000, // Example: total results
+  });
+
+  const changePage = (newPage) => {
+    if (newPage > 0 && newPage <= pagination.total_pages) {
+      setPagination(prevState => ({
+        ...prevState,
+        current_page: newPage,
+      }));
+    }
+  };
+
   const handleSaveEdit = (id) => {
     editTeacher(id, editingTeacher);
     setEditingId(null);
   };
 
   return (
-  <div>
-    <h3 className="text-lg font-semibold mb-4">List of Teachers</h3>
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+    <div className="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
+    <div className="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
+      <div className="flex justify-between">
+        <div className="inline-flex border rounded w-7/12 px-2 lg:px-6 h-12 bg-transparent">
+          <div className="flex flex-wrap items-stretch w-full h-full mb-6 relative">
+            <div className="flex">
+              <span className="flex items-center leading-normal bg-transparent rounded rounded-r-none border border-r-0 border-none lg:px-3 py-2 whitespace-no-wrap text-grey-dark text-sm">
+                <svg width="18" height="18" className="w-4 lg:w-auto" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.11086 15.2217C12.0381 15.2217 15.2217 12.0381 15.2217 8.11086C15.2217 4.18364 12.0381 1 8.11086 1C4.18364 1 1 4.18364 1 8.11086C1 12.0381 4.18364 15.2217 8.11086 15.2217Z" stroke="#455A64" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M16.9993 16.9993L13.1328 13.1328" stroke="#455A64" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </div>
+            <input type="text" className="flex-shrink flex-grow border-blue-500 flex-auto leading-normal tracking-wide w-px flex-1 border border-none border-l-0 rounded rounded-l-none px-3 relative focus:outline-none text-xxs text-lg lg:text-base border-blue-500 text-gray-500 font-thin" placeholder="Search" />
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="align-middle inline-block min-w-full shadow overflow-hidden bg-white shadow-dashboard px-8 pt-3 rounded-bl-lg rounded-br-lg">
+      <table className="min-w-full">
         <thead>
-          <tr className="bg-blue-gray-50">
-            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Name</th>
-            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Email</th>
-            <th className="py-3 px-4 border-b text-left" style={{ color: "#6e82a7" }}>Actions</th>
+          <tr>
+          <th className="px-6 py-3 text-left text-blue-300 border-none leading-4 tracking-wider">Name</th>
+              <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Email</th>
+              <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Department</th>
+              <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody>
-          {teachers.map((teacher) => (
+        <tbody className="bg-white">
+          {teachers.map((teacher, index) => (
             <tr key={teacher.id}>
               <td>
                 {editingId === teacher.id ? (
                   <input
                     type="text"
+                    className="border border-gray-300 p-1 rounded"
                     name="name"
                     value={editingTeacher.name}
                     onChange={handleInputChange}
                   />
                 ) : (
-                  teacher.name
+                  <div className="text-sm leading-5 font-bold" style={{ color: "#6e82a7" }}>{teacher.name}</div>
                 )}
               </td>
-              <td>
+              <td className="px-6 py-4 whitespace-no-wrap border-none">
                 {editingId === teacher.id ? (
                   <input
                     type="email"
+                    className="border border-gray-300 p-1 rounded"
                     name="email"
                     value={editingTeacher.email}
+                    style={{ borderColor: "#95b8d1" }}
                     onChange={handleInputChange}
                   />
                 ) : (
-                  teacher.email
+                  <div className="text-sm leading-5 text-blue-900 font-bold" style={{ color: "#6e82a7" }}>{teacher.email}</div>
                 )}
               </td>
-              <td>
+              <td className="px-6 py-4 whitespace-no-wrap border-none">
+                  {editingId === teacher.id ? (
+                    <input
+                      type="text"
+                      className="border border-gray-300 p-1 rounded"
+                      value={editingTeacher.department}
+                      style={{ borderColor: "#95b8d1" }}
+                    />
+                  ) : (<div className="text-sm leading-5 text-blue-900 font-bold" style={{ color: "#6e82a7" }}>{teacher.department}</div>
+                  )}
+                </td>
+              <td className="px-6 py-4 whitespace-no-wrap border-none">
                 {editingId === teacher.id ? (
-                  <button onClick={() => handleSaveEdit(teacher.id)}>
+                  <button className="px-5 py-2 border rounded transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none"
+                  style={{ backgroundColor: "#6e82a7", color: "#FFFFFF" }} onClick={() => handleSaveEdit(teacher.id)}>
                     Save
                   </button>
                 ) : (
                   <button
-                    className="edit-btn"
+                  className="px-5 py-2 border rounded-lg transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none mr-2"
+                  style={{ backgroundColor: "#95b8d1", color: "#FFFFFF" }}
                     onClick={() => handleEditTeacher(teacher.id, teacher)}
                   >
                     Edit
                   </button>
                 )}
                 <button
-                  className="delete-btn"
+                  className="px-5 py-2 border rounded-lg transition duration-300 hover:bg-blue-700 hover:text-white focus:outline-none"
+                  style={{ backgroundColor: "#d18787", color: "#FFFFFF" }}
                   onClick={() => deleteTeacher(teacher.id)}
                 >
                   Delete
@@ -190,6 +240,16 @@ const TeacherManagement = ({ teachers, deleteTeacher, editTeacher }) => {
           ))}
         </tbody>
       </table>
+      <div className="sm:flex-1 sm:flex sm:items-center sm:justify-between mt-4 work-sans">
+          <div>
+            <nav className="relative z-0 inline-flex shadow-sm">
+              {/* Pagination buttons */}
+            </nav>
+          </div>
+          <div>
+            {/* Department filter dropdown */}
+          </div>
+        </div>
     </div>
   </div>
 );
@@ -260,43 +320,44 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
   };
 
   return (
-    <div className="add-teacher-popup-container">
-      <div className="add-teacher-popup">
-        <h2>Add New Teacher</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Name:</label>
-            <input 
-              type="text" 
-              id="name"
+    <div className="fixed inset-0 bg-gray-800 mt-12 bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white p-6 rounded-md shadow-md max-w-md w-full">
+        <h2 className="text-2xl font-bold mb-4" style={{ color: "#95b8d1" }}>
+          Enter Teacher Information
+        </h2>
+        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-8 pr-4">
+          <div>
+            <input
+              type="text"
               name="name"
-              value={teacherData.name} 
-              onChange={handleChange} 
-              required 
+              placeholder="Name"
+              value={teacherData.name}
+              onChange={handleChange}
+              className="p-3 border border-d18787 rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
+              required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email:</label>
-            <input 
-              type="email" 
-              id="email"
+            <input
+              type="email"
               name="email"
-              value={teacherData.email} 
-              onChange={handleChange} 
-              required 
+              placeholder="Email"
+              value={teacherData.email}
+              onChange={handleChange}
+              className="p-3 border border-d6eadf rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
+              required
             />
-          </div>
-          <div className="form-group">
-            <label htmlFor="phone_number">Phone Number:</label>
-            <input 
-              type="text" 
-              id="phone_number"
+            <input
+              type="text"
               name="phone_number"
-              value={teacherData.phone_number} 
-              onChange={handleChange} 
-              required 
+              placeholder="Phone Number"
+              value={teacherData.phone_number}
+              onChange={handleChange}
+              className="p-3 border border-b8e0d2 rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
+              required
             />
-          </div>
+            </div>
           <div className="form-group">
             <label htmlFor="gender">Gender:</label>
             <select
@@ -304,6 +365,8 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
               name="gender"
               value={teacherData.gender}
               onChange={handleChange}
+              className="p-3 border border-95b8d1 rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
               required
             >
               <option value="">Select gender</option>
@@ -321,6 +384,8 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
               name="college" 
               value={teacherData.college} 
               onChange={handleChange}
+              className="p-3 border border-d18787 rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
               required
             >
               <option value="">Select College</option>
@@ -338,7 +403,8 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
           name="department"
           value={teacherData.department}
           onChange={handleChange}
-          className="border border-gray-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          className="p-3 border border-d6eadf rounded-md mb-4"
+            style={{ borderColor: "#95b8d1" }}
         >
           <option value="">Select Department</option>
           {departmentOptions.map((option, index) => (
@@ -355,6 +421,8 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
               name="semester" 
               value={teacherData.semester} 
               onChange={handleChange}
+              className="p-3 border border-95b8d1 rounded-md mb-4"
+              style={{ borderColor: "#95b8d1" }}
               required
             >
               <option value="">Select Semester</option>
@@ -383,12 +451,27 @@ const AddTeacherPopup = ({ addTeacher, setShowAddTeacherPopup }) => {
               id="profile_picture"
               name="profile_picture"
               onChange={handleFileChange} 
+              className="p-3 border border-d18787 rounded-md col-span-2"
+              style={{ borderColor: "#95b8d1" }}
               required 
             />
           </div>
-          <div className="button-group">
-            <button type="submit">Add Teacher</button>
-            <button type="button" onClick={() => setShowAddTeacherPopup(false)}>Cancel</button>
+          <div className="col-span-2 flex justify-end">
+            <button
+              type="submit"
+              className="bg-blue-500 text-white py-2 px-4 rounded mr-2"
+              style={{ backgroundColor: "#6e82a7" }}
+            >
+              Add Teacher
+            </button>
+            <button
+              type="button"
+              className="bg-gray-500 text-white py-2 px-4 rounded"
+              style={{ backgroundColor: "#d18787" }}
+              onClick={() => setShowAddTeacherPopup(false)}
+            >
+              Cancel
+            </button>
           </div>
         </form>
       </div>

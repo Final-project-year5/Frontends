@@ -20,6 +20,7 @@ function PermissionPage() {
       try {
         const response = await axios.get("http://localhost:8000/api/teachers/");
         setTeachers(response.data);
+        console.log("response teacher: ", response.data);
       } catch (error) {
         console.error("Error fetching teachers:", error);
       }

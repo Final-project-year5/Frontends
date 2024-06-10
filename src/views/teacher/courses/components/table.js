@@ -7,7 +7,6 @@ import {
   Th,
   Thead,
   Tr,
-  useColorModeValue,
   Box,
   IconButton,
   Popover,
@@ -17,7 +16,8 @@ import {
   PopoverCloseButton,
   PopoverBody,
   Button,
-  Flex
+  Flex,
+  useColorModeValue
 } from "@chakra-ui/react";
 import { MdMoreVert } from "react-icons/md";
 import { useHistory } from "react-router-dom";
@@ -29,26 +29,22 @@ export default function CheckTable({ teacherId }) {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
-    // Retrieve the access token from local storage
     const accessToken = localStorage.getItem('accessToken');
 
-    // Fetch the list of courses assigned to the specific teacher
     axios.get('http://localhost:8000/api/teacher-courses/', {
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
     })
-      .then(response => setCourses(response.data))
-      .catch(error => console.error('Error fetching courses:', error));
+    .then(response => setCourses(response.data))
+    .catch(error => console.error('Error fetching courses:', error));
   }, []);
 
   const handleSelectCourse = (index) => {
     const selectedCourse = courses[index];
-    console.log("Handle select course function called with index:", selectedCourse.id);
     if (selectedCourse) {
-      // Use history to navigate to the view page
+      console.log("selected course id: ", selectedCourse.id);
       history.push(`/courses/${selectedCourse.id}`);
-      console.log("after history push");
     } else {
       console.log("Selected course is not available");
     }
@@ -103,13 +99,10 @@ export default function CheckTable({ teacherId }) {
                     />
                   </PopoverTrigger>
                   <PopoverContent>
-                    <PopoverArrow/>
-                    <PopoverCloseButton/>
+                    <PopoverArrow />
+                    <PopoverCloseButton />
                     <PopoverBody>
-                      <Text
-                        cursor="pointer"
-                        onClick={() => handleSelectCourse(index)}
-                      >
+                      <Text cursor="pointer" onClick={() => handleSelectCourse(index)}>
                         View
                       </Text>
                     </PopoverBody>

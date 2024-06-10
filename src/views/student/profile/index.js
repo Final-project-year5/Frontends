@@ -3,6 +3,7 @@ import avatars7 from "./avatar7.png";
 import "./ProfilePage.css";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 function ProfilePage() {
   const [fullName, setFullName] = useState("YUYUN FRANCIS BERINYUY");
@@ -19,8 +20,12 @@ function ProfilePage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [phoneNumberError, setPhoneNumberError] = useState("");
+  const [collegeOptions, setCollegeOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+
   useEffect(() => {
     fetchUserProfile();
+    fetchCollegeOptions();
   }, []);
 
   const handleEdit = (setter) => (event) => setter(event.target.value);
@@ -66,6 +71,30 @@ function ProfilePage() {
   } catch (error) {
     console.error("Error fetching user profile:", error);
     // Set error state if needed
+  }
+};
+
+const fetchCollegeOptions = () => {
+  axios
+    .get("http://localhost:8000/api/colleges/")
+    .then((response) => setCollegeOptions(response.data))
+    .catch((error) => console.error("Error fetching colleges:", error));
+};
+
+const handleCollegeChange = (e) => {
+  const selectedCollegeId = e.target.value;
+  setCollege(selectedCollegeId);
+  fetchDepartmentOptions(selectedCollegeId);
+};
+
+const fetchDepartmentOptions = (collegeId) => {
+  if (collegeId) {
+    axios
+      .get(`http://localhost:8000/api/departments/${collegeId}/`)
+      .then((response) => setDepartmentOptions(response.data))
+      .catch((error) =>
+        console.error("Error fetching departments:", error)
+      );
   }
 };
 
@@ -286,23 +315,23 @@ const handleSaveClick = async () => {
           </div>
           {/* College */}
           <div>
-            <label
-              className="block font-bold text-xl"
-              style={{ color: "#6e82a7" }}
-            >
-              College:
-            </label>
+          <label className="block font-bold text-xl" style={{ color: "#6e82a7" }}>
+            College:
+          </label>
             {isEditMode ? (
               <select
-                value={college}
-                onChange={handleEdit(setCollege)}
-                className="mt-1 p-2 border rounded w-full"
-                style={{ borderColor: "#b8e0d2" }}
-              >
-                <option value="College1">College1</option>
-                <option value="College2">College2</option>
-                <option value="College3">College3</option>
-              </select>
+              value={college}
+              onChange={handleCollegeChange}
+              className="mt-1 p-2 border rounded w-full"
+              style={{ borderColor: "#b8e0d2" }}
+            >
+              <option value="">Select College</option>
+              {collegeOptions.map((college) => (
+                <option key={college.id} value={college.id}>
+                  {college.name}
+                </option>
+              ))}
+            </select>
             ) : (
               <p className="mt-1">{college}</p>
             )}
@@ -317,15 +346,18 @@ const handleSaveClick = async () => {
             </label>
             {isEditMode ? (
               <select
-                value={department}
-                onChange={handleEdit(setDepartment)}
-                className="mt-1 p-2 border rounded w-full"
-                style={{ borderColor: "#b8e0d2" }}
-              >
-                <option value="Department1">Department1</option>
-                <option value="Department2">Department2</option>
-                <option value="Department3">Department3</option>
-              </select>
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="mt-1 p-2 border rounded w-full"
+              style={{ borderColor: "#b8e0d2" }}
+            >
+              <option value="">Select Department</option>
+              {departmentOptions.map((department) => (
+                <option key={department.id} value={department.id}>
+                  {department.name}
+                </option>
+              ))}
+            </select>
             ) : (
               <p className="mt-1">{department}</p>
             )}
