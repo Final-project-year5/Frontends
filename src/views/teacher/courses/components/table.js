@@ -37,7 +37,18 @@ export default function CheckTable({ teacherId }) {
 
   const handleSelectCourse = (index) => {
     const selectedCourse = courses[index];
+<<<<<<< HEAD
     history.push(`/courses/${selectedCourse.id}`);
+=======
+    console.log("Handle select course function called with index:", selectedCourse.id);
+    if (selectedCourse) {
+      // Use history to navigate to the view page
+      history.push(`/courses/${selectedCourse.id}`);
+      console.log("after history push");
+    } else {
+      console.log("Selected course is not available");
+    }
+>>>>>>> 8db6ec8d10bb6a9c55803df803038bcc5a662e5f
   };
 
   const handleAddNewCourse = () => {

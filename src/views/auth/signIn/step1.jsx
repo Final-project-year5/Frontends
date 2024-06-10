@@ -9,6 +9,7 @@ const StepOneFields = ({
   email,
   setEmail,
   gender,
+  
   setGender,
   onNext,
 }) => {
@@ -27,7 +28,7 @@ const StepOneFields = ({
     if (!id.trim()) {
       return "ID is required";
     }
-    const idRegex = /^Ets\d{4}\/\d{2}$/;
+    const idRegex = /^ETS\d{4}\/\d{2}$/;
     if (!idRegex.test(id.trim())) {
       return "Invalid ID format. It should be like ETS0451/12";
     }

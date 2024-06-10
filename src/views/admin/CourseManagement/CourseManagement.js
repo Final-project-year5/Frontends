@@ -125,46 +125,63 @@ const CourseManagement = () => {
         <div className="overlay">
           <div className="add-course-popup">
             <h3>Add Course</h3>
-            <input
-              type="text"
+            <select
+              name="college"
               value={editedCourse.college}
-              onChange={(e) => setEditedCourse({ ...editedCourse, college: e.target.value })}
-              placeholder="College"
-            />
-            <input
-              type="text"
+              onChange={handleChange}
+            >
+              <option value="">Select College</option>
+              {collegeOptions.map(college => (
+                <option key={college.id} value={college.id}>
+                  {college.name}
+                </option>
+              ))}
+            </select>
+            <select
+              name="department"
               value={editedCourse.department}
-              onChange={(e) => setEditedCourse({ ...editedCourse, department: e.target.value })}
-              placeholder="Department"
-            />
+              onChange={handleChange}
+            >
+              <option value="">Select Department</option>
+              {departmentOptions.map((department, index) => (
+                <option key={index} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
             <input
               type="text"
+              name="name"
               value={editedCourse.name}
-              onChange={(e) => setEditedCourse({ ...editedCourse, name: e.target.value })}
+              onChange={handleChange}
               placeholder="Course Name"
             />
             <input
               type="text"
+              name="code"
               value={editedCourse.code}
-              onChange={(e) => setEditedCourse({ ...editedCourse, code: e.target.value })}
+              onChange={handleChange}
               placeholder="Course Code"
             />
             <input
               type="text"
+              name="duration"
               value={editedCourse.duration}
-              onChange={(e) => setEditedCourse({ ...editedCourse, duration: e.target.value })}
+              onChange={handleChange}
               placeholder="Course Duration"
             />
             <input
               type="text"
+              name="year"
               value={editedCourse.year}
-              onChange={(e) => setEditedCourse({ ...editedCourse, year: e.target.value })}
+              onChange={handleChange}
               placeholder="Course Year"
             />
             <input
               type="text"
+              name="prerequest"
               value={editedCourse.prerequest}
-              onChange={(e) => setEditedCourse({ ...editedCourse, prerequest: e.target.value })}
+              onChange={handleChange}
               placeholder="Course Prerequest"
             />
             <button onClick={addCourse}>Add Course</button>
@@ -172,6 +189,7 @@ const CourseManagement = () => {
           </div>
         </div>
       )}
+
       <div className="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 pr-10 lg:px-8">
         <div className="align-middle rounded-tl-lg rounded-tr-lg inline-block w-full py-4 overflow-hidden bg-white shadow-lg px-12">
           <div className="flex justify-between">
@@ -247,6 +265,72 @@ const CourseManagement = () => {
       </div>
     );
     
+      <h3>List of Courses</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>College</th>
+            <th>Department</th>
+            <th>Course Name</th>
+            <th>Course Code</th>
+            <th>Duration</th>
+            <th>Year</th>
+            <th>Prerequest</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {courses.map(course => (
+            <tr key={course.id}>
+              <td>{editingId === course.id ? (
+                <select
+                  name="college"
+                  value={editedCourse.college}
+                  onChange={handleChange}
+                >
+                  <option value="">Select College</option>
+                  {collegeOptions.map(college => (
+                    <option key={college.id} value={college.id}>
+                      {college.name}
+                    </option>
+                  ))}
+                </select>
+              ) : course.college}</td>
+              <td>{editingId === course.id ? (
+                <select
+                  name="department"
+                  value={editedCourse.department}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Department</option>
+                  {departmentOptions.map((department, index) => (
+                    <option key={index} value={department}>
+                      {department}
+                    </option>
+                  ))}
+                </select>
+              ) : course.department}</td>
+              <td>{editingId === course.id ? <input type="text" name="name" value={editedCourse.name} onChange={handleChange} /> : course.name}</td>
+              <td>{editingId === course.id ? <input type="text" name="code" value={editedCourse.code} onChange={handleChange} /> : course.code}</td>
+              <td>{editingId === course.id ? <input type="text" name="duration" value={editedCourse.duration} onChange={handleChange} /> : course.duration}</td>
+              <td>{editingId === course.id ? <input type="text" name="year" value={editedCourse.year} onChange={handleChange} /> : course.year}</td>
+              <td>{editingId === course.id ? <input type="text" name="prerequest" value={editedCourse.prerequest} onChange={handleChange} /> : course.prerequest}</td>
+              <td>
+                {editingId === course.id ? (
+                  <button onClick={() => handleSaveEdit(course.id)}>Save</button>
+                ) : (
+                  <>
+                    <button className="edit-btn" onClick={() => handleEditClick(course.id)}>Edit</button>
+                    <button className="delete-btn" onClick={() => deleteCourse(course.id)}>Delete</button>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 };
 
 export default CourseManagement;
