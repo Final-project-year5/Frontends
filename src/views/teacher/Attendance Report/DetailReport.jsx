@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "../../../components/sidebar/Sidebar";
 import { SidebarContext } from "../../../contexts/SidebarContext";
 import routes from "routes.js";
@@ -26,12 +26,11 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import { FiMoreVertical } from "react-icons/fi";
+import { FiChevronDown,FiMoreVertical } from "react-icons/fi";
 import Navbar from "components/navbar/NavbarAdmin.js";
+import axios from "axios";
 
 const DetailReport = (props) => {
-  const courseName = "Database Management";
-  const totalAttendance = 65;
   const { ...rest } = props;
   const [fixed] = useState(false);
   const history = useHistory();
@@ -40,7 +39,11 @@ const DetailReport = (props) => {
   const [mark, setMark] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editStudent, setEditStudent] = useState(null);
-
+  const [studentData, setStudentData] = useState([]);
+  const [filteredStudents, setFilteredStudents] = useState([]);
+  const [sections, setSections] = useState([]);
+  const [selectedSection, setSelectedSection] = useState(null);
+  const [course, setCourse] = useState(null);
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     month: "short",
@@ -48,104 +51,17 @@ const DetailReport = (props) => {
     year: "numeric",
   });
 
-  const getCurrentMonthAndYear = () => {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    const date = new Date();
-    const month = months[date.getMonth()];
-    const year = date.getFullYear();
-    return `${month}, ${year}`;
-  };
-
-  const sampleStudentData = [
-    {
-      firstName: "meron",
-      lastName: "abera",
-      ID: "ets 0451/12",
-      status: "present",
-    },
-    {
-      firstName: "tsedet",
-      lastName: "mekonnen",
-      ID: "ets0450/12",
-      status: "absent",
-    },
-    {
-      firstName: "meron",
-      lastName: "edea",
-      ID: "ets1050/12",
-      status: "permission",
-    },
-    {
-      firstName: "kaleb",
-      lastName: "abera",
-      ID: "ets 0451/12",
-      status: "present",
-    },
-    {
-      firstName: "joni",
-      lastName: "mekonnen",
-      ID: "ets0450/12",
-      status: "absent",
-    },
-    {
-      firstName: "migbar",
-      lastName: "edea",
-      ID: "ets1050/12",
-      status: "permission",
-    },
-    {
-      firstName: "meron",
-      lastName: "abera",
-      ID: "ets 0451/12",
-      status: "present",
-    },
-    {
-      firstName: "tsedet",
-      lastName: "mekonnen",
-      ID: "ets0450/12",
-      status: "absent",
-    },
-    {
-      firstName: "meron",
-      lastName: "edea",
-      ID: "ets1050/12",
-      status: "permission",
-    },
-    {
-      firstName: "meron",
-      lastName: "abera",
-      ID: "ets 0451/12",
-      status: "present",
-    },
-    {
-      firstName: "tsedet",
-      lastName: "mekonnen",
-      ID: "ets0450/12",
-      status: "absent",
-    },
-    {
-      firstName: "meron",
-      lastName: "edea",
-      ID: "ets1050/12",
-      status: "permission",
-    },
-  ];
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/attendance-report-by-section/") // Replace <int:teacher_id> with 1 or the appropriate teacher ID
+      .then((response) => response.json())
+      .then((data) => {
+        setStudentData(data.C);
+      })
+      .catch((error) => console.error("Error fetching data:", error));
+  }, []);
 
   const handleViewClick = (student) => {
-    history.push(`/studentperformance/${student.ID}/marks`);
+    history.push(`/studentperformance/${student.student_name}/marks`);
   };
 
   const handleEditModalOpen = (student) => {
@@ -159,15 +75,11 @@ const DetailReport = (props) => {
 
   const handleCloseModal = () => {
     setIsAddModalOpen(false);
-    // Reset form state if needed
     setMarkType("");
     setMark("");
   };
 
   const handleFormSubmit = () => {
-    // Handle form submission logic here
-    // You can access markType and mark state variables here
-    // Reset form state if needed
     setMarkType("");
     setMark("");
     setIsAddModalOpen(false);
@@ -244,16 +156,47 @@ const DetailReport = (props) => {
     }
   };
 
-  sampleStudentData.sort((a, b) => {
-    const firstNameA = a.firstName.toLowerCase();
-    const firstNameB = b.firstName.toLowerCase();
-    if (firstNameA < firstNameB) return -1;
-    if (firstNameA > firstNameB) return 1;
+  studentData.sort((a, b) => {
+    const studentNameA = a.student_name.toLowerCase();
+    const studentNameB = b.student_name.toLowerCase();
+    if (studentNameA < studentNameB) return -1;
+    if (studentNameA > studentNameB) return 1;
     return 0;
   });
 
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
+
+  // useEffect(() => {
+  //   const fetchCourseDetails = async () => {
+  //     try {
+  //       const courseId = parseInt(id); // Ensure id is parsed as an integer
+  //       console.log("id", courseId);
+  //       const courseResponse = await axios.get(`http://localhost:8000/api/courses/${courseId}/`);
+  //       setCourse(courseResponse.data);
+
+  //       const studentsResponse = await axios.get(`http://localhost:8000/api/course_students/${courseResponse.data.joinCode}/`);
+  //       setStudents(studentsResponse.data);
+  //       setFilteredStudents(studentsResponse.data);
+
+  //       const sectionsResponse = await axios.get(`http://localhost:8000/api/sections/`);
+  //       const uniqueSections = Array.from(new Set(sectionsResponse.data.map(section => section.name)))
+  //                                  .map(name => sectionsResponse.data.find(section => section.name === name));
+  //       setSections(uniqueSections);
+  //     } catch (error) {
+  //       console.error('Error fetching data:', error);
+  //     }
+  //   };
+
+  //   fetchCourseDetails();
+  // }, []);
+
+  // const handleFilterBySection = (section) => {
+  //   setSelectedSection(section);
+  //   setFilteredStudents(
+  //     students.filter((student) => student.section === section.name)
+  //   );
+  // };
 
   const exportAttendanceExcel = () => {
     fetch("http://localhost:8000/api/export-attendance-excel")
@@ -284,6 +227,7 @@ const DetailReport = (props) => {
         console.error("Error:", error);
       });
   };
+
   return (
     <Box marginRight="10">
       <Box>
@@ -311,92 +255,48 @@ const DetailReport = (props) => {
               <p className="text-sm ml-2 font-bold text-gray-400 mb-4 ">
                 Today {today}
               </p>
+              <Menu>
+                <Button
+                  colorScheme="teal"
+                  marginLeft="650"
+                  rightIcon={<FiChevronDown />}
+                >
+                  Filter by Section
+                </Button>
+
+                {/* <MenuList>
+                  {sections.map((section) => (
+                    <MenuItem
+                      key={section.id}
+                      onClick={() => handleFilterBySection(section)}
+                    >
+                      {section.name}
+                    </MenuItem>
+                  ))}
+                </MenuList> */}
+              </Menu>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 mt-4 md:mt-0 gap-4">
-              <div>
-                <h2 className="text-sm mt-4 md:mt-24 font-bold text-gray-400">
-                  Course Name
-                </h2>
-                <p className="text-sm font-bold">{courseName}</p>
-              </div>
-              <div className="flex flex-col items-end">
-                <h2 className="text-sm mt-4 md:mt-24 font-bold text-gray-400">
-                  Total Attendance
-                </h2>
-                <p className="text-sm mr-14 font-bold">{totalAttendance}</p>
-              </div>
-            </div>
-          </div>
-          <div className="mt-8 mb-4 flex items-center">
-            <p className="text-sm font-bold text-gray-400 mr-4">
-              {getCurrentMonthAndYear()}
-            </p>
-            <hr className="flex-grow border-gray-300" />
           </div>
           <div className="mt-8 overflow-x-auto">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold mb-2">Student List</h2>
-              <button
-                className="px-2 py-2 border rounded-md font-semibold"
-                style={{ backgroundColor: "#6e82a7", color: "#FFFFFF" }}
-                onClick={exportAttendanceExcel}
-              >
-                Export Attendance to Excel
-              </button>
-            </div>
-
-            <p className="text-xs text-gray-500 mt-2">
-              Recorded time: {new Date().toLocaleTimeString()}
-            </p>
-            <table className="w-full border-collapse border-blue-500 rounded-2xl bg-white text-left text-sm text-gray-500">
-              <thead className="bg-blue-500">
-                <tr>
-                  <th className="px-6 py-4 font-bold text-gray-900">No</th>
-                  <th className="px-6 py-4 font-bold text-gray-900">
-                    First Name
-                  </th>
-                  <th className="px-6 py-4 font-bold text-gray-900">
-                    Last Name
-                  </th>
-                  <th className="px-6 py-4 font-bold text-gray-900">ID</th>
-                  <th className="px-6 py-4 font-bold text-gray-900">Status</th>
-                  <th className="px-6 py-4 font-bold text-gray-900"> </th>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th className="py-2 px-4 border">Date</th>
+                  <th className="py-2 px-4 border">Student Name</th>
+                  <th className="py-2 px-4 border">Status</th>
+                  <th className="py-2 px-4 border">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y bg-blue-500 divide-blue-100 border-t border-blue-500">
-                {sampleStudentData.map((student, index) => (
-                  <tr className="hover:bg-blue-100" key={index}>
-                    <td className="px-6 py-4">{index + 1}</td>
-                    <td className="px-6 py-4">{student.firstName}</td>
-                    <td className="px-6 py-4">{student.lastName}</td>
-                    <td className="px-6 py-4">{student.ID}</td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-semibold ${
-                          student.status === "present"
-                            ? "bg-green-50 text-green-600"
-                            : student.status === "absent"
-                            ? "bg-red-50 text-red-600"
-                            : "bg-yellow-50 text-yellow-600"
-                        }`}
-                      >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${
-                            student.status === "present"
-                              ? "bg-green-600"
-                              : student.status === "absent"
-                              ? "bg-red-600"
-                              : "bg-yellow-600"
-                          }`}
-                        ></span>
-                        {student.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
+              <tbody>
+                {studentData.map((student, index) => (
+                  <tr key={index} className="even:bg-gray-100">
+                    <td className="py-2 px-4 border">{student.date}</td>
+                    <td className="py-2 px-4 border">{student.student_name}</td>
+                    <td className="py-2 px-4 border">{student.status}</td>
+                    <td className="py-2 px-4 border flex justify-center">
                       <Menu>
                         <MenuButton
                           as={IconButton}
-                          aria-label="Options"
                           icon={<FiMoreVertical />}
                           variant="outline"
                         />
@@ -409,9 +309,8 @@ const DetailReport = (props) => {
                           >
                             Edit
                           </MenuItem>
-
                           <MenuItem onClick={() => handleAddClick(student)}>
-                            Add
+                            Add Mark
                           </MenuItem>
                         </MenuList>
                       </Menu>
@@ -421,132 +320,87 @@ const DetailReport = (props) => {
               </tbody>
             </table>
           </div>
+
           <Modal isOpen={isAddModalOpen} onClose={handleCloseModal}>
             <ModalOverlay />
-            <ModalContent style={{ marginTop: "214px" }}>
-              <ModalHeader
-                style={{ backgroundColor: "#6e82a7", color: "#FFFFFF" }}
-              >
-                Add Attendance
-              </ModalHeader>
+            <ModalContent>
+              <ModalHeader>Add Mark</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <FormControl>
-                  <FormLabel
-                    style={{
-                      color: "#6e82a7",
-                      fontWeight: "bold",
-                      marginTop: "10px",
-                    }}
-                  >
-                    Mark Type
-                  </FormLabel>
+                <FormControl mb={4}>
+                  <FormLabel>Mark Type</FormLabel>
                   <Select
+                    placeholder="Select option"
                     value={markType}
                     onChange={(e) => setMarkType(e.target.value)}
                   >
-                    <option value="Quiz">Participation</option>
-                    <option value="participation">Quiz</option>
+                    <option value="homework">Homework</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="exam">Exam</option>
                   </Select>
                 </FormControl>
-                <FormControl mt={4}>
-                  <FormLabel
-                    style={{
-                      color: "#6e82a7",
-                      fontWeight: "bold",
-                      marginTop: "10px",
-                    }}
-                  >
-                    Mark
-                  </FormLabel>
+                <FormControl mb={4}>
+                  <FormLabel>Mark</FormLabel>
                   <Input
                     type="number"
-                    min="0"
                     value={mark}
                     onChange={(e) => setMark(e.target.value)}
                   />
                 </FormControl>
-              </ModalBody>
-              <div className="flex justify-end mt-4 mb-4">
-                <Button
-                  onClick={handleCloseModal}
-                  style={{ backgroundColor: "#d18787" }}
-                  className="mr-64"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleFormSubmit}
-                  style={{ backgroundColor: "#6e82a7" }}
-                  mr={3}
-                >
+                <Button colorScheme="blue" onClick={handleFormSubmit}>
                   Submit
                 </Button>
-              </div>
+              </ModalBody>
             </ModalContent>
           </Modal>
-          <Modal isOpen={isEditModalOpen} onClose={handleCloseModal}>
+
+          <Modal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+          >
             <ModalOverlay />
-            <ModalContent style={{ marginTop: "214px" }}>
-              <ModalHeader
-                style={{ backgroundColor: "#6e82a7", color: "#FFFFFF" }}
-              >
-                Edit Attendance
-              </ModalHeader>
+            <ModalContent>
+              <ModalHeader>Edit Student</ModalHeader>
               <ModalCloseButton />
               <ModalBody>
-                <FormControl>
-                  <FormLabel
-                    style={{
-                      color: "#6e82a7",
-                      fontWeight: "bold",
-                      marginTop: "10px",
-                    }}
-                  >
-                    Mark Type
-                  </FormLabel>
-                  <Select
-                    value={markType}
-                    onChange={(e) => setMarkType(e.target.value)}
-                  >
-                    <option value="Quiz">Participation</option>
-                    <option value="participation">Quiz</option>
-                  </Select>
-                </FormControl>
-                <FormControl mt={4}>
-                  <FormLabel
-                    style={{
-                      color: "#6e82a7",
-                      fontWeight: "bold",
-                      marginTop: "10px",
-                    }}
-                  >
-                    Mark
-                  </FormLabel>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={mark}
-                    onChange={(e) => setMark(e.target.value)}
-                  />
-                </FormControl>
+                {editStudent && (
+                  <div>
+                    <FormControl mb={4}>
+                      <FormLabel>Student Name</FormLabel>
+                      <Input
+                        type="text"
+                        value={editStudent.student_name}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            student_name: e.target.value,
+                          })
+                        }
+                      />
+                    </FormControl>
+                    <FormControl mb={4}>
+                      <FormLabel>Status</FormLabel>
+                      <Select
+                        placeholder="Select status"
+                        value={editStudent.status}
+                        onChange={(e) =>
+                          setEditStudent({
+                            ...editStudent,
+                            status: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="Present">Present</option>
+                        <option value="Absent">Absent</option>
+                        <option value="Late">Late</option>
+                      </Select>
+                    </FormControl>
+                    <Button colorScheme="blue" onClick={handleFormSubmit}>
+                      Save
+                    </Button>
+                  </div>
+                )}
               </ModalBody>
-              <div className="flex justify-end mt-4 mb-4">
-                <Button
-                  onClick={handleCloseModal}
-                  style={{ backgroundColor: "#d18787" }}
-                  className="mr-64"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleFormSubmit}
-                  style={{ backgroundColor: "#6e82a7" }}
-                  mr={3}
-                >
-                  Submit
-                </Button>
-              </div>
             </ModalContent>
           </Modal>
         </Box>

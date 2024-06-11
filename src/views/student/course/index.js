@@ -34,7 +34,7 @@ function JoinPopup({ handleJoin, handleClose }) {
   );
 }
 
-function CourseCard({ course, handleJoinClick }) {
+function CourseCard({ course, handleCourseClick }) {
   const getColorClass = (courseType) => {
     switch (courseType) {
       case 'AI':
@@ -51,24 +51,14 @@ function CourseCard({ course, handleJoinClick }) {
   const colorClass = getColorClass(course.type);
 
   return (
-    <div className="course-card">
+    <div className="course-card" onClick={() => handleCourseClick(course.id)}>
       <div className={`course-type ${colorClass}`}>{course.type}</div>
       <div className="course-info">
         <h3>{course.title}</h3>
         <p><strong>Course Name:</strong> {course.name}</p>
         <p><strong>Pre-Request:</strong> {course.prerequest}</p>
         <p><strong>Course Duration:</strong> {course.duration}</p>
-        {/* <div className="course-progress">
-          <div className="progress-bar" style={{ width: `${course.progress}%` }}></div>
-          <span>{course.progress}%</span>
-        </div> */}
-        {/* <div className="course-stats">
-          <span>{course.students}k</span>
-          <span>{course.lessons}</span>
-          <span>{course.tasks}</span>
-        </div> */}
       </div>
-      {/* <button className="join-button" onClick={() => handleJoinClick(course.id)}>Join +</button> */}
     </div>
   );
 }
@@ -78,6 +68,10 @@ function CoursePage() {
   const [showPopup, setShowPopup] = useState(false);
   const [courses, setCourses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
+  const [attendanceData, setAttendanceData] = useState([]);
+  const [showAttendance, setShowAttendance] = useState(false);
+  const [error, setError] = useState(null);
+
   const accessToken = localStorage.getItem('accessToken');
 
   useEffect(() => {
@@ -124,6 +118,31 @@ function CoursePage() {
 
   const handleCourseClick = (courseId) => {
     setSelectedCourse(courseId);
+    setShowAttendance(false);
+    setError(null);
+
+    // Fetch attendance data for the selected course
+    fetch(`http://localhost:8000/api/course-attendance/${courseId}/`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        setAttendanceData(data);
+        setShowAttendance(true);
+      } else {
+        console.error('API response is not an array:', data);
+        setError('Failed to load attendance data.');
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching attendance data:', error);
+      setError('Failed to load attendance data.');
+    });
   };
 
   const handleJoinCourse = (joinCode, courseId) => {
@@ -167,36 +186,43 @@ function CoursePage() {
           <h2 className="section-title font-bold text-2xl" style={{color:'#6e82a7',}}>Courses You're Taking Part</h2>
           <div className="course-list mt-4">
             {courses.map((course) => (
-              <CourseCard key={course.id} course={course} handleJoinClick={handleJoinClick} />
+              <CourseCard key={course.id} course={course} handleCourseClick={handleCourseClick} />
             ))}
           </div>
         </div>
         <div className="calendar-section">
-        
           <div className="calendar">
-          {showPopup && <JoinPopup handleJoin={(joinCode) => handleJoinCourse(joinCode, selectedCourse)} handleClose={handleClosePopup} />}
-          <button className='text-md  ml-96 border rounded-md w-32 h-10 font-bold text-white' style={{backgroundColor:'#6e82a7'}} onClick={() => setShowPopup(true)}>      +Join class</button>
+            {showPopup && <JoinPopup handleJoin={(joinCode) => handleJoinCourse(joinCode, selectedCourse)} handleClose={handleClosePopup} />}
+            <button className='text-md  ml-96 border rounded-md w-32 h-10 font-bold text-white' style={{backgroundColor:'#6e82a7'}} onClick={() => setShowPopup(true)}>+ Join class</button>
             <CalendarView />
-          </div>
-          <div className="upcoming-submissions">
-            <h3>Upcoming Submissions</h3>
-            <ul>
-              {upcomingClasses.map((upcoming) => (
-                <li key={upcoming.id}>
-                  <div className={`submission-type ${upcoming.typeColor}`}>{upcoming.type}</div>
-                  <div className="submission-info">
-                    <p>{upcoming.title}</p>
-                    <span>{upcoming.date}</span>
-                  </div>
-                  <button className="submit-button">Submit</button>
-                </li>
-              ))}
-            </ul>
-            <button className="show-all-button">Show All</button>
           </div>
         </div>
       </div>
-    
+      {showAttendance && (
+        <div className="attendance-section">
+          <h2>Attendance Report</h2>
+          {error ? (
+            <p className="error-message">{error}</p>
+          ) : (
+            <table className="attendance-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attendanceData.map((attendance, index) => (
+                  <tr key={index}>
+                    <td>{attendance.date}</td>
+                    <td>{attendance.status}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
     </div>
   );
 }
