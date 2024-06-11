@@ -1,82 +1,112 @@
-import React, { useState, useEffect } from 'react';
-import { Portal, Box, useDisclosure } from '@chakra-ui/react';
+/* global google */
+import React, { useEffect, useState } from 'react';
+import { Switch, Redirect, Route } from 'react-router-dom';
+import { Box, Portal, useDisclosure, Heading, List, ListItem, Spinner, Text } from '@chakra-ui/react';
 import Footer from 'components/footer/FooterAdmin.js';
 import Navbar from 'components/navbar/NavbarAdmin.js';
 import Sidebar from 'components/sidebar/Sidebar.js';
 import { SidebarContext } from 'contexts/SidebarContext';
-import { Redirect, Route, Switch } from 'react-router-dom';
 import routes from 'routes.js';
-
-// Load the Google Charts library
-const loadGoogleCharts = (callback) => {
-  const script = document.createElement('script');
-  script.src = 'https://www.gstatic.com/charts/loader.js';
-  script.onload = callback;
-  document.head.appendChild(script);
-};
 
 export default function Dashboard(props) {
   const { ...rest } = props;
   const [fixed] = useState(false);
   const [toggleSidebar, setToggleSidebar] = useState(false);
-  const [chartData, setChartData] = useState([]);
+  const [userCounts, setUserCounts] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch data from backend
   useEffect(() => {
-    const token = 'YOUR_NEW_ACCESS_TOKEN'; // Replace with your new token
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
 
-    fetch('http://127.0.0.1:8000/api/attendance-report', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('Fetched data:', data);
+        const userResponse = await fetch("http://localhost:8000/api/user-counts/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-        if (data.dates && data.present_percentage && data.absent_percentage) {
-          const formattedData = [['Date', 'Present Percentage', 'Absent Percentage']];
-          data.dates.forEach((date, index) => {
-            formattedData.push([
-              date,
-              data.present_percentage[index],
-              data.absent_percentage[index]
-            ]);
-          });
-          setChartData(formattedData);
-
-          loadGoogleCharts(drawChart);
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          console.log("Fetched user data:", userData);
+          setUserCounts(userData);
         } else {
-          console.error('Data is not in the expected format:', data);
+          console.error("Failed to fetch user counts");
         }
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
+
+        const courseResponse = await fetch("http://localhost:8000/api/courses/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (courseResponse.ok) {
+          const courseData = await courseResponse.json();
+          console.log("Fetched course data:", courseData);
+          setCourses(courseData);
+        } else {
+          console.error("Failed to fetch courses");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const drawChart = () => {
-    if (!window.google) return;
+  useEffect(() => {
+    if (userCounts && userCounts.attendance_data) {
+      google.charts.load('current', { packages: ['corechart'] });
+      google.charts.setOnLoadCallback(drawChart);
+    }
+  }, [userCounts]);
 
-    window.google.charts.load('current', { packages: ['corechart'] });
-    window.google.charts.setOnLoadCallback(() => {
-      const data = window.google.visualization.arrayToDataTable(chartData);
-      const options = {
-        title: 'Student Attendance',
-        curveType: 'function',
-        legend: { position: 'bottom' },
-      };
-      const chart = new window.google.visualization.LineChart(document.getElementById('curve_chart'));
-      chart.draw(data, options);
-    });
+  const drawChart = () => {
+    if (!userCounts || !userCounts.attendance_data) {
+      console.error("Attendance data is not available.");
+      return;
+    }
+
+    const data = new google.visualization.DataTable();
+    data.addColumn('string', 'Date');
+    data.addColumn('number', 'Present Percentage');
+    data.addColumn('number', 'Absent Percentage');
+
+    const attendanceData = userCounts.attendance_data;
+    const rows = Object.keys(attendanceData).map(date => [
+      date,
+      attendanceData[date].present_percentage,
+      attendanceData[date].absent_percentage,
+    ]);
+
+    data.addRows(rows);
+
+    const options = {
+      title: 'Attendance Report',
+      curveType: 'function',
+      legend: { position: 'bottom' },
+      hAxis: { title: 'Date' },
+      vAxis: { title: 'Percentage' },
+    };
+
+    const chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+    chart.draw(data, options);
   };
 
   const getRoute = () => {
-    return window.location.pathname !== '/teacher/full-screen-maps';
+    return window.location.pathname !== '/admin/full-screen-maps';
   };
 
   const getActiveRoute = (routes) => {
-    let activeRoute = 'teacher';
+    let activeRoute = 'admin';
     for (let i = 0; i < routes.length; i++) {
       if (routes[i].collapse) {
         let collapseActiveRoute = getActiveRoute(routes[i].items);
@@ -143,7 +173,7 @@ export default function Dashboard(props) {
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
-      if (prop.layout === '/teacher') {
+      if (prop.layout === '/admin') {
         return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
       }
       if (prop.collapse) {
@@ -159,7 +189,6 @@ export default function Dashboard(props) {
 
   document.documentElement.dir = 'ltr';
   const { onOpen } = useDisclosure();
-  document.documentElement.dir = 'ltr';
 
   return (
     <Box>
@@ -170,20 +199,20 @@ export default function Dashboard(props) {
             setToggleSidebar,
           }}
         >
-          <Sidebar routes={routes} display='none' {...rest} />
+          <Sidebar routes={routes} display="none" {...rest} />
           <Box
-            float='right'
-            minHeight='100vh'
-            height='100%'
-            overflow='auto'
-            position='relative'
-            maxHeight='100%'
+            float="right"
+            minHeight="100vh"
+            height="100%"
+            overflow="auto"
+            position="relative"
+            maxHeight="100%"
             w={{ base: '100%', xl: 'calc( 100% - 290px )' }}
             maxWidth={{ base: '100%', xl: 'calc( 100% - 290px )' }}
-            transition='all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)'
-            transitionDuration='.2s, .2s, .35s'
-            transitionProperty='top, bottom, width'
-            transitionTimingFunction='linear, linear, ease'
+            transition="all 0.33s cubic-bezier(0.685, 0.0473, 0.346, 1)"
+            transitionDuration=".2s, .2s, .35s"
+            transitionProperty="top, bottom, width"
+            transitionTimingFunction="linear, linear, ease"
           >
             <Portal>
               <Box>
@@ -199,12 +228,29 @@ export default function Dashboard(props) {
             </Portal>
 
             {getRoute() ? (
-              <Box mx='auto' p={{ base: '20px', md: '30px' }} pe='20px' minH='100vh' pt='50px'>
+              <Box mx="auto" p={{ base: '20px', md: '30px' }} pe="20px" minH="100vh" pt="50px">
                 <Switch>
                   {getRoutes(routes)}
-                  <Redirect from='/' to='/teacher/default' />
+                  <Redirect from="/" to="/admin/default" />
                 </Switch>
-                <Box id="curve_chart" style={{ width: '900px', height: '500px' }}></Box>
+                {loading ? (
+                  <Spinner />
+                ) : (
+                  <Box>
+                    <Heading size="md" mb="4">Attendance Chart</Heading>
+                    {userCounts && userCounts.attendance_data ? (
+                      <div id="chart_div"></div>
+                    ) : (
+                      <Text>Attendance data is not available.</Text>
+                    )}
+                    <Heading size="md" mt="8" mb="4">Courses</Heading>
+                    <List spacing={3}>
+                      {courses.map((course) => (
+                        <ListItem key={course.id}>{course.name}</ListItem>
+                      ))}
+                    </List>
+                  </Box>
+                )}
               </Box>
             ) : null}
             <Box>

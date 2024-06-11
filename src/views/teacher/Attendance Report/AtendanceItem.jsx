@@ -18,18 +18,12 @@ const AttendanceItem = ({ date, checkIn, checkOut, totalHours, notes, itemIndex 
       </div>
       <hr className="my-2 border-gray-200" />
       <div className="grid grid-cols-3 gap-4">
+        
         <div>
-          <p className="text-xs mb-2 font-bold text-gray-400">Recorded time</p>
-          <p className="font-bold">{checkIn}</p>
-        </div>
-        <div>
-          <p className="text-xs font-bold mb-2 text-gray-400">Section</p>
+          <p className="text-xl  font-bold mb-2 text-gray-400">Section</p>
           <p className="font-bold ml-3">{section}</p>
         </div>
-        <div>
-          <p className="text-xs font-bold mb-2 text-gray-400">Students</p>
-          <p className="font-bold ml-3">{totalStudents}</p>
-        </div>
+       
       </div>
       <hr className="my-4 border-gray-200" />
       <div className="mt-2 flex">

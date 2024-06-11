@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
+  Table,
+  Tbody,
+  Td,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  useColorModeValue,
   Box,
-  Button,
-  Flex,
   IconButton,
   Popover,
   PopoverTrigger,
@@ -10,9 +16,8 @@ import {
   PopoverArrow,
   PopoverCloseButton,
   PopoverBody,
-  Text,
-  useColorModeValue,
-  SimpleGrid
+  Button,
+  Flex
 } from "@chakra-ui/react";
 import { MdMoreVert } from "react-icons/md";
 import { useHistory } from "react-router-dom";
@@ -24,8 +29,10 @@ export default function CheckTable({ teacherId }) {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
+    // Retrieve the access token from local storage
     const accessToken = localStorage.getItem('accessToken');
 
+    // Fetch the list of courses assigned to the specific teacher
     axios.get('http://localhost:8000/api/teacher-courses/', {
       headers: {
         'Authorization': `Bearer ${accessToken}`
@@ -37,9 +44,6 @@ export default function CheckTable({ teacherId }) {
 
   const handleSelectCourse = (index) => {
     const selectedCourse = courses[index];
-<<<<<<< HEAD
-    history.push(`/courses/${selectedCourse.id}`);
-=======
     console.log("Handle select course function called with index:", selectedCourse.id);
     if (selectedCourse) {
       // Use history to navigate to the view page
@@ -48,83 +52,81 @@ export default function CheckTable({ teacherId }) {
     } else {
       console.log("Selected course is not available");
     }
->>>>>>> 8db6ec8d10bb6a9c55803df803038bcc5a662e5f
   };
 
   const handleAddNewCourse = () => {
     history.push("/teacher-course-selection");
   };
 
-  // Array of pastel border colors
-  const borderColors = ["#FFB3BA", "#B3E5FC", "#C3E88D", "#FFD180", "#CFD8DC"];
-
   return (
     <Box
-      borderRadius="xl"
-      marginTop='55px'
+      bg="white"
+      borderRadius="md"
+      boxShadow="md"
       p="4"
-      width="6xl"
+      maxW="xxl"
       mx="auto"
       overflowX="auto"
     >
       <Flex justifyContent="space-between" mb="4">
-        <Text fontSize="2xl" fontWeight="bold" color={'#6e82a7'}>
+        <Text fontSize="2xl" fontWeight="bold" color={textColor}>
           Course List
         </Text>
-        <Button backgroundColor='#6e82a7' color={'#FFFFFF'} onClick={handleAddNewCourse}>
+        <Button colorScheme="blue" onClick={handleAddNewCourse}>
           Add New Course
         </Button>
       </Flex>
-      <Flex flexWrap="wrap" justifyContent="space-between">
-        {courses.map((course, index) => (
-          <Box
-            key={index}
-            borderWidth="1px"
-            borderRadius="lg"
-            overflow="hidden"
-            p="4"
-            mb="4"
-            width={["100%", "48%", "48%"]}
-            bg="white"
-            boxShadow="md"
-            cursor="pointer"
-            onClick={() => handleSelectCourse(index)}
-            borderRightWidth="4px"
-            borderBottomWidth="4px"
-            borderColor={borderColors[index % borderColors.length]} // Cycle through pastel border colors
-          >
-            <Box display="flex" alignItems="center" justifyContent="space-between">
-              <Text fontSize="lg" fontWeight="bold">{course.name}</Text>
-              <Popover>
-                <PopoverTrigger>
-                  <IconButton
-                    aria-label="More options"
-                    icon={<MdMoreVert />}
-                    variant="ghost"
-                    size="sm"
-                  />
-                </PopoverTrigger>
-                <PopoverContent>
-                  <PopoverArrow />
-                  <PopoverCloseButton />
-                  <PopoverBody>
-                    <Text cursor="pointer" onClick={() => handleSelectCourse(index)}>
-                      View
-                    </Text>
-                  </PopoverBody>
-                </PopoverContent>
-              </Popover>
-            </Box>
-            <Text color="gray.500">{course.code}</Text>
-            <SimpleGrid columns={2} spacing={4} mt="2">
-              <Text className="font-bold">Duration: {course.duration}</Text>
-              <Text className="font-bold">Year: {course.year}</Text>
-              <Text className="font-bold">Prerequisites: {course.prerequest}</Text>
-              <Text className="font-bold">Join Code: {course.joinCode}</Text>
-            </SimpleGrid>
-          </Box>
-        ))}
-      </Flex>
+      <Table variant="simple" color="gray.500" mb="24px">
+        <Thead>
+          <Tr>
+            <Th minW="50px"></Th>
+            <Th minW="50px" bg="blue.200">No</Th>
+            <Th minW="100px" bg="blue.200">Course Code</Th>
+            <Th minW="100px" bg="blue.200">Course Name</Th>
+            <Th minW="100px" bg="blue.200">Duration</Th>
+            <Th minW="100px" bg="blue.200">Year</Th>
+            <Th minW="200px" bg="blue.200">Pre-request</Th>
+            <Th minW="100px" bg="blue.200">Join Code</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {courses.map((course, index) => (
+            <Tr key={index}>
+              <Td>
+                <Popover maxW="xs" maxH="xs">
+                  <PopoverTrigger>
+                    <IconButton
+                      aria-label="More options"
+                      icon={<MdMoreVert />}
+                      variant="ghost"
+                      size="sm"
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverArrow/>
+                    <PopoverCloseButton/>
+                    <PopoverBody>
+                      <Text
+                        cursor="pointer"
+                        onClick={() => handleSelectCourse(index)}
+                      >
+                        View
+                      </Text>
+                    </PopoverBody>
+                  </PopoverContent>
+                </Popover>
+              </Td>
+              <Td>{index + 1}</Td>
+              <Td>{course.code}</Td>
+              <Td>{course.name}</Td>
+              <Td>{course.duration}</Td>
+              <Td>{course.year}</Td>
+              <Td>{course.prerequest}</Td>
+              <Td>{course.joinCode}</Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
     </Box>
   );
 }

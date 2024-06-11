@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'; // Import Link component
 import AttendanceItem from "./AtendanceItem";
 
 const AttendanceHistory = ({ attendanceData }) => {
-  const courseName = "Database Management";
+  // const courseName = "Database Management";
   const totalAttendance = 65;
 
   const today = new Date().toLocaleDateString("en-US", {
@@ -33,7 +33,7 @@ const AttendanceHistory = ({ attendanceData }) => {
             Today {today}
           </p>
         </div>
-        <div className="grid grid-cols-3 mt-8 gap-4">
+        {/* <div className="grid grid-cols-3 mt-8 gap-4">
           <div className="mt-12">
             <h2 className="text-sm font-bold text-gray-400">Course Name</h2>
             <p className="text-sm font-bold">{courseName}</p>
@@ -44,7 +44,7 @@ const AttendanceHistory = ({ attendanceData }) => {
             </h2>
             <p className="text-sm mr-14 font-bold">{totalAttendance}</p>
           </div>
-        </div>
+        </div> */}
       </div>
       <div className="mt-8 mb-4 flex items-center">
         <p className="text-sm font-bold text-gray-400 mr-4">

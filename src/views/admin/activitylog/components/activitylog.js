@@ -76,6 +76,7 @@ export default function CheckTable() {
       p="4"
       maxW="xxl"
       mx="auto"
+      marginTop={'55px'}
       overflowX="auto"
     >
       {/* Your Date Range Picker and Modal code */}
