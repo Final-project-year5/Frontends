@@ -67,7 +67,7 @@ const ViewPermission = () => {
 
   const approvePermission = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/approve-permission/${permissionId}`);
+      await axios.post(`http://localhost:8000/api/approve-permission/${permissionId}/`);
       alert("Permission approved successfully!");
       // Add logic to handle success
     } catch (error) {
@@ -79,7 +79,7 @@ const ViewPermission = () => {
 
   const rejectPermission = async () => {
     try {
-      await axios.post(`http://localhost:8000/api/reject-permission/${permissionId}`);
+      await axios.post(`http://localhost:8000/api/reject-permission/${permissionId}/`);
       alert("Permission rejected successfully!");
       // Add logic to handle success
     } catch (error) {
@@ -97,20 +97,11 @@ const ViewPermission = () => {
         <Sidebar routes={routes} display="none" />
       </SidebarContext.Provider>
       <Box className="ml-80">
-        <Navbar onOpen={onOpen} brandText="Edit Schedule" />
+        <Navbar onOpen={onOpen} brandText="Permission Approval" />
         <Container maxWidth={false}>
           <Divider style={{ marginBottom: 20 }} />
           <Box className="mt-2 mb-2 flex-grow py-8">
             <div className="container mx-auto">
-              <div className="flex justify-between">
-                <div className="grid grid-cols-3 mt-8 gap-4">
-                  <div>
-                    <h2 className="text-2xl mt-24 font-bold text-blue-600">
-                      Student Permission
-                    </h2>
-                  </div>
-                </div>
-              </div>
               <div className="mt-4 mb-4 flex items-center">
                 <hr className="flex-grow border-gray-300" />
               </div>
@@ -129,13 +120,19 @@ const ViewPermission = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-lg mb-4 bg-blue-100 text-gray-500 rounded-md w-56 pl-4 pr-4 pt-1 pb-1">
-                          {permissionData.student.fullName}
+                          {permissionData.student.user.name}
                         </p>
                         <p className="text-lg mb-4 bg-blue-100 text-gray-500 rounded-md w-56 pl-4 pr-4 pt-1 pb-1">
                           {permissionData.student.section}
                         </p>
                         <p className="text-lg mb-4 bg-blue-100 text-gray-500 rounded-md w-56 pl-4 pr-4 pt-1 pb-1">
-                          {permissionData.permission.attachedFile}
+                          {permissionData.permission.evidence ? (
+                            <a href={permissionData.permission.evidence} target="_blank" rel="noopener noreferrer">
+                              View Attached File
+                            </a>
+                          ) : (
+                            "No Attached File"
+                          )}
                         </p>
                       </div>
                       <div className="w-20">
@@ -144,7 +141,7 @@ const ViewPermission = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-lg mb-4 text-gray-500 bg-blue-100 rounded-md w-56 pl-4 pr-4 pt-1 pb-1">
-                          {permissionData.student.studentID}
+                          {permissionData.student.student_id}
                         </p>
                         <p className="text-lg text-gray-500 mb-4 bg-blue-100 rounded-md w-56 pl-4 pr-4 pt-1 pb-1">
                           {permissionData.permission.reason}
@@ -153,35 +150,41 @@ const ViewPermission = () => {
                     </div>
                   )
                 )}
-                {permissionData && permissionData.student && (
-                  <>
-                    <div className="flex mt-4">
-                      <Button
-                        colorScheme="blue"
-                        onClick={approvePermission}
-                        size="md"
-                        color="white"
-                        className="ml-64"
-                        _hover={{ bg: "white", color: "blue.500" }}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        colorScheme="red"
-                        onClick={rejectPermission}
-                        size="md"
-                        className="ml-72"
-                        color="white"
-                        _hover={{ bg: "white", color: "red.500" }}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                    <br />
-                    <hr className="mt-8" />
-                    <Text className="text-2xl font-bold mt-8 mb-8 text-blue-500">
-                      Attendance History of {permissionData.student.fullName}:
-                    </Text>
+                {permissionData && permissionData.permission && (
+  <>
+    {/* Approve/Reject Buttons */}
+    <div className="flex mt-4">
+      <Button
+        colorScheme="blue"
+        onClick={approvePermission}
+        size="md"
+        color="white"
+        className="ml-64"
+        _hover={{ bg: "white", color: "blue.500" }}
+      >
+        Approve
+      </Button>
+      <Button
+        colorScheme="red"
+        onClick={rejectPermission}
+        size="md"
+        className="ml-72"
+        color="white"
+        _hover={{ bg: "white", color: "red.500" }}
+      >
+        Reject
+      </Button>
+    </div>
+    <br />
+    <hr className="mt-8" />
+    {/* Status Section */}
+    <Text className="text-2xl font-bold mt-8 mb-8 text-blue-500">
+      Status: {permissionData.permission.status}
+    </Text>
+    {/* Attendance History Section */}
+    <Text className="text-2xl font-bold mt-8 mb-8 text-blue-500">
+      Attendance History of {permissionData.student.user.name}:
+    </Text>
                     <div className="flex flex-wrap gap-4">
                       {permissionData.attendance_history &&
                         permissionData.attendance_history.map((attendance) => (

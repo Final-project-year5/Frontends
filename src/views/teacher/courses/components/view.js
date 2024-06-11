@@ -28,7 +28,8 @@ import AdminNavbar from "components/navbar/NavbarAdmin";
 import axios from 'axios';
 
 const ViewCoursePage = () => {
-  const { index } = useParams();
+  const { id } = useParams();
+  const [course, setCourse] = useState(null);
   const [tableData, setTableData] = useState([]);
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
@@ -39,94 +40,102 @@ const ViewCoursePage = () => {
   const modalBodyRef = useRef(null);
   const captureIntervalRef = useRef(null);
 
-  const courseIndex = parseInt(index, 10);
-  console.log("index from params:", index);
-  console.log("parsed course index:", courseIndex);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCourseDetails = async () => {
       try {
-        // Fetch courses data
-        const courseResponse = await axios.get('http://localhost:8000/api/courses');
-        setTableData(courseResponse.data);
-        console.log("Fetched courses:", courseResponse.data);
+        const courseId = parseInt(id); // Ensure id is parsed as an integer
+        console.log("id", courseId);
+        const courseResponse = await axios.get(`http://localhost:8000/api/courses/${courseId}/`);
+        setCourse(courseResponse.data);
 
-        // Fetch sections data
-        const sectionResponse = await axios.get('http://localhost:8000/api/sections');
-        setSections(sectionResponse.data);
-        console.log("Fetched sections:", sectionResponse.data);
+        const studentsResponse = await axios.get(`http://localhost:8000/api/course_students/${courseResponse.data.joinCode}/`);
+        setStudents(studentsResponse.data);
+        setFilteredStudents(studentsResponse.data);
+
+        const sectionsResponse = await axios.get(`http://localhost:8000/api/sections/`);
+        const uniqueSections = Array.from(new Set(sectionsResponse.data.map(section => section.name)))
+                                   .map(name => sectionsResponse.data.find(section => section.name === name));
+        setSections(uniqueSections);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchCourseDetails();
+  }, [id]);
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      if (tableData.length > 0 && !isNaN(courseIndex) && courseIndex >= 0 && courseIndex < tableData.length) {
-        const courseId = tableData[courseIndex]?.id;
-        if (courseId) {
-          try {
-            const studentsResponse = await axios.get(`http://localhost:8000/api/course_students/${courseId}`);
-            setStudents(studentsResponse.data);
-            setFilteredStudents(studentsResponse.data);
-            console.log("Fetched students:", studentsResponse.data);
-          } catch (error) {
-            console.error('Error fetching students:', error);
-          }
-        }
-      } else {
-        console.error("Invalid course index detected in fetchStudents");
-      }
-    };
-
-    fetchStudents();
-  }, [courseIndex, tableData]);
-
-  console.log("tableData length:", tableData.length);
-  console.log("courseIndex value:", courseIndex);
-
-  if (!tableData || tableData.length === 0 || isNaN(courseIndex) || courseIndex < 0 || courseIndex >= tableData.length) {
-    return <div>Error: Invalid course index</div>;
-  }
-
-  const course = tableData[courseIndex];
-  console.log("Selected course:", course);
 
   const handleTakeAttendance = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       setCameraOpen(true);
-
+  
       const videoElement = document.createElement('video');
       videoElement.srcObject = stream;
       videoElement.autoplay = true;
       videoElement.play();
       videoElementRef.current = videoElement;
-
+  
       if (modalBodyRef.current) {
         modalBodyRef.current.appendChild(videoElement);
       }
-
+  
       const captureFrame = async () => {
         const canvas = document.createElement('canvas');
         canvas.width = videoElement.videoWidth;
         canvas.height = videoElement.videoHeight;
         const context = canvas.getContext('2d');
         context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/jpeg');
-
+  
+        // Convert canvas to data URL
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        
+        const formData = new FormData();
+        formData.append('image', dataUrl);
+        formData.append('section_id', selectedSection.id); // Add section ID
+        formData.append('course_id', parseInt(id)); // Add course ID
+  
         try {
-          const response = await axios.post('http://localhost:8000/api/mark_attendance', { image: imageData });
-          console.log(response.data);
+          const response = await axios.post('http://localhost:8000/api/mark_attendance', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          });
+  
+          // Draw rectangles around detected faces
+          const { faces, recognized_faces } = response.data;
+          
+          context.strokeStyle = 'red'; // Set default stroke style
+  
+          faces.forEach(face => {
+            context.lineWidth = 2;
+            context.strokeRect(face.x, face.y, face.width, face.height);
+            console.log("faces: ",face.x, face.y, face.width, face.height);
+          });
+  
+          context.strokeStyle = 'green'; // Change stroke style for recognized faces
+          recognized_faces.forEach(face => {
+            context.lineWidth = 2;
+            context.strokeRect(face.x, face.y, face.width, face.height);
+            console.log("faces: ",face.x, face.y, face.width, face.height);
+          });
+  
+          // Update modal body with canvas
+          modalBodyRef.current.innerHTML = '';
+          modalBodyRef.current.appendChild(canvas);
+  
         } catch (error) {
           console.error('Error sending frame to backend:', error);
         }
       };
-
+  
       captureIntervalRef.current = setInterval(captureFrame, 1000);
+      const timeLimit = 10 * 1000; // 10 seconds
+  
+      setTimeout(() => {
+        handleCloseCamera();
+      }, timeLimit);
     } catch (error) {
       console.error('Error accessing camera:', error);
     }
@@ -189,12 +198,22 @@ const ViewCoursePage = () => {
           <Box mb="4">
             <Box display="flex" justifyContent="space-between" mb="2" mt="10">
               <Box>
-                <h1>Course: {course.name}</h1>
-                <p>Course Code: {course.code}</p>
+                {course ? (
+                  <>
+                    <h1>Course: {course.name}</h1>
+                    <p>Course Code: {course.code}</p>
+                  </>
+                ) : (
+                  <p>Loading course details...</p>
+                )}
               </Box>
               <Box>
-                <p>Duration: {course.duration}</p>
-                <p>Pre-requisite: {course.prerequisite}</p>
+                {course && (
+                  <>
+                    <p>Duration: {course.duration}</p>
+                    <p>Pre-requisite: {course.prerequisite}</p>
+                  </>
+                )}
               </Box>
             </Box>
           </Box>
@@ -212,8 +231,7 @@ const ViewCoursePage = () => {
               <Thead>
                 <Tr>
                   <Th bg="blue.200">No</Th>
-                  <Th bg="blue.200">First Name</Th>
-                  <Th bg="blue.200">Last Name</Th>
+                  <Th bg="blue.200">Name</Th>
                   <Th bg="blue.200">Student Id</Th>
                   <Th bg="blue.200">Section</Th>
                 </Tr>
@@ -222,8 +240,7 @@ const ViewCoursePage = () => {
                 {filteredStudents.map((student, index) => (
                   <Tr key={index}>
                     <Td>{index + 1}</Td>
-                    <Td>{student.fname}</Td>
-                    <Td>{student.lname}</Td>
+                    <Td>{student.name}</Td>
                     <Td>{student.student_id}</Td>
                     <Td>{student.section}</Td>
                   </Tr>

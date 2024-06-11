@@ -54,28 +54,22 @@ function PermissionPage() {
     } else {
       setFileSizeError("");
     }
+
+    const accessToken = localStorage.getItem("accessToken");
   
     try {
-      // Fetch the user details to retrieve the associated student ID
-      const response = await fetch("http://localhost:8000/api/profile/", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          "Content-Type": "application/json",
-        },
-      });
-      
-      const profileData = await response.json();
-      const studentId = profileData.student_id;
-  
       const formData = new FormData();
       formData.append("teacher", teacher);
       formData.append("reason", reason);
       formData.append("evidence", evidence);
       formData.append("sickLeave", sickLeave);
-      formData.append("studentId", studentId); // Include student ID in the formData
-  
-      const submitResponse = await axios.post("http://localhost:8000/api/create_permission/", formData);
+
+      const submitResponse = await axios.post("http://localhost:8000/api/create_permission/", formData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       console.log(submitResponse.data);
       toast.success("Permission request submitted successfully!");
       // Reset form fields after successful submission

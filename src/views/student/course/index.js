@@ -6,6 +6,7 @@ function JoinPopup({ handleJoin, handleClose }) {
   const [joinCode, setJoinCode] = useState('');
 
   const handleSubmit = () => {
+    console.log("Join code submitted:", joinCode);
     handleJoin(joinCode);
     setJoinCode('');
   };
@@ -58,23 +59,13 @@ function CourseCard({ course, handleJoinClick }) {
         <p><strong>Course Name:</strong> {course.name}</p>
         <p><strong>Pre-Request:</strong> {course.prerequest}</p>
         <p><strong>Course Duration:</strong> {course.duration}</p>
-        {/* <div className="course-progress">
-          <div className="progress-bar" style={{ width: `${course.progress}%` }}></div>
-          <span>{course.progress}%</span>
-        </div> */}
-        {/* <div className="course-stats">
-          <span>{course.students}k</span>
-          <span>{course.lessons}</span>
-          <span>{course.tasks}</span>
-        </div> */}
       </div>
-      {/* <button className="join-button" onClick={() => handleJoinClick(course.id)}>Join +</button> */}
+      <button className="join-button" onClick={handleJoinClick}>Join +</button>
     </div>
   );
 }
 
 function CoursePage() {
-  const [selectedCourse, setSelectedCourse] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [courses, setCourses] = useState([]);
   const [upcomingClasses, setUpcomingClasses] = useState([]);
@@ -122,17 +113,12 @@ function CoursePage() {
     };
   }, [accessToken]);
 
-  const handleCourseClick = (courseId) => {
-    setSelectedCourse(courseId);
-  };
+  const handleJoinCourse = (joinCode) => {
+    console.log("handle join course", joinCode);
+    if (accessToken) {
+      const joinData = { join_code: joinCode };
 
-  const handleJoinCourse = (joinCode, courseId) => {
-    if (accessToken && courseId) {
-      const joinData = {
-        join_code: joinCode,
-      };
-
-      fetch(`http://localhost:8000/api/join_course/${courseId}/`, {
+      fetch('http://localhost:8000/api/join_course/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,19 +126,25 @@ function CoursePage() {
         },
         body: JSON.stringify(joinData),
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
         .then((data) => {
           console.log(data);
         })
         .catch((error) => {
           console.error('Error joining course:', error);
         });
+    } else {
+      console.error('AccessToken is missing');
     }
     setShowPopup(false);
   };
 
-  const handleJoinClick = (courseId) => {
-    setSelectedCourse(courseId);
+  const handleJoinClick = () => {
     setShowPopup(true);
   };
 
@@ -172,10 +164,9 @@ function CoursePage() {
           </div>
         </div>
         <div className="calendar-section">
-        
           <div className="calendar">
-          {showPopup && <JoinPopup handleJoin={(joinCode) => handleJoinCourse(joinCode, selectedCourse)} handleClose={handleClosePopup} />}
-          <button className='text-md  ml-96 border rounded-md w-32 h-10 font-bold text-white' style={{backgroundColor:'#6e82a7'}} onClick={() => setShowPopup(true)}>      +Join class</button>
+            {showPopup && <JoinPopup handleJoin={handleJoinCourse} handleClose={handleClosePopup} />}
+            <button className='text-md ml-96 border rounded-md w-32 h-10 font-bold text-white' style={{backgroundColor:'#6e82a7'}} onClick={handleJoinClick}>+ Join class</button>
             <CalendarView />
           </div>
           <div className="upcoming-submissions">
@@ -196,7 +187,6 @@ function CoursePage() {
           </div>
         </div>
       </div>
-    
     </div>
   );
 }

@@ -16,34 +16,62 @@ import Sidebar from "../../../components/sidebar/Sidebar";
 import { SidebarContext } from "../../../contexts/SidebarContext";
 import Navbar from "components/navbar/NavbarAdmin.js";
 import routes from "routes.js";
+import axios from "axios";
 
-const EditSchedule = ({ sampleSchedule, setSampleSchedule }, props) => {
+const EditSchedule = ({ sampleSchedule, setSampleSchedule, match }) => {
   const [courseName, setCourseName] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
   const [selectedDay, setSelectedDay] = useState("");
   const history = useHistory();
-  const { ...rest } = props;
+  const { ...rest } = match.params;
   const [fixed] = useState(false);
 
-  
-
   // Function to handle updating the schedule
-  const handleEditSchedule = () => {
-    // Update the schedule logic here
-    // Redirect to view schedule page after updating
-    history.push("/view-schedule"); // Assuming "/add-schedule" is the route path for the AddSchedule page
+  const handleEditSchedule = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) {
+        throw new Error("No access token found");
+      }
+  
+      // Ensure sampleSchedule is defined before accessing its properties
+      if (!sampleSchedule || !sampleSchedule.id) {
+        throw new Error("Sample schedule is not defined or missing ID");
+      }
+  
+      const response = await axios.post(
+        `http://localhost:8000/api/edit-schedule/${sampleSchedule.id}/`,
+        {
+          day_of_the_week: selectedDay,
+          start_time: selectedTime,
+          location: sampleSchedule.location,
+          course_code: sampleSchedule.course_code,
+          course_name: courseName,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        history.push("/view-schedule");
+      }
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
   };
 
   const handleCancel = () => {
-    // Redirect to view schedule page without saving changes
-    history.push("/view-schedule"); // Assuming "/add-schedule" is the route path for the AddSchedule page
+    history.push("/view-schedule");
   };
 
   document.documentElement.dir = "ltr";
   const { onOpen } = useDisclosure();
-  document.documentElement.dir = "ltr";
-  
+
   return (
     <Box marginRight="10">
       <Box>
@@ -53,11 +81,7 @@ const EditSchedule = ({ sampleSchedule, setSampleSchedule }, props) => {
         <Box marginLeft="80">
           <Portal>
             <Box>
-              <Navbar
-                onOpen={onOpen}
-                brandText="Edit Schedule"
-                {...rest}
-              />
+              <Navbar onOpen={onOpen} brandText="Edit Schedule" {...rest} />
             </Box>
           </Portal>
           <Box mt={2} mb={2} component="main" className="flex-grow py-8">

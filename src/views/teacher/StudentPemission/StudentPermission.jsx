@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { Menu, MenuButton, MenuList, MenuItem, Button } from "@chakra-ui/react";
 
 const StudentPermission = () => {
   const history = useHistory();
@@ -21,9 +22,7 @@ const StudentPermission = () => {
 
   const fetchPermissionData = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/students_permission/"
-      );
+      const response = await axios.get("http://localhost:8000/api/students_permission/");
       return response.data;
     } catch (error) {
       console.error("Error fetching permission data:", error);
@@ -31,17 +30,15 @@ const StudentPermission = () => {
     }
   };
 
-  const handleEditClick = (permissionId) => {
-    console.log("Edit button clicked for permission ID:", permissionId);
+  const handleViewClick = (permissionId) => {
+    console.log("View button clicked for permission ID:", permissionId);
     history.push(`/view-permission/${permissionId}`);
   };
 
   return (
     <div className="container mx-auto">
       <div className="mt-20 mb-4 flex items-center">
-        <p className="text-sm font-bold text-gray-400 mr-4">
-          Current Month and Year
-        </p>
+        <p className="text-sm font-bold text-gray-400 mr-4">Current Month and Year</p>
         <hr className="flex-grow border-gray-300" />
       </div>
 
@@ -51,74 +48,48 @@ const StudentPermission = () => {
           <table className="min-w-full">
             <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-blue-300 border-none leading-4 tracking-wider">
-                  Student Name
-                </th>
-                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">
-                  Student ID
-                </th>
-                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">
-                  Section
-                </th>
-                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">
-                  Reason
-                </th>
-                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">
-                  Submitted Date
-                </th>
-                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">
-                  Status
-                </th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none leading-4 tracking-wider">Options</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none leading-4 tracking-wider">Student Name</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Student ID</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Section</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Reason</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Submitted Date</th>
+                <th className="px-6 py-3 text-left text-blue-300 border-none text-sm leading-4 tracking-wider">Status</th>
               </tr>
             </thead>
             <tbody className="bg-white">
               {filteredUserData.map((user, index) => (
-                <tr
-                  key={index}
-                  className={index % 2 === 0 ? "bg-gray-100" : ""}
-                >
+                <tr key={index} className={index % 2 === 0 ? "bg-gray-100" : ""}>
                   <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.name}
+                    <Menu>
+                      <MenuButton as={Button} rightIcon={<span>&#x22EE;</span>}>
+                        Options
+                      </MenuButton>
+                      <MenuList>
+                        <MenuItem onClick={() => handleViewClick(user.permission_id)}>View</MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </td>
+                  <td className="px-6 py-4 whitespace-no-wrap border-none">{user.student_name}</td>
+                  <td className="px-6 py-4 whitespace-no-wrap border-none">{user.student_id}</td>
+                  <td className="px-6 py-4 whitespace-no-wrap border-none">{user.student_section}</td>
+                  <td className="px-6 py-4 whitespace-no-wrap border-none">
+                    {user.reason ? <span>{user.reason}</span> : <span>No reason provided</span>}
                   </td>
                   <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.student_id}
+                    {user.submitted_date ? <span>{user.submitted_date}</span> : <span>No submitted date available</span>}
                   </td>
                   <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.section}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.permission && user.permission.reason ? (
-                      <span>{user.permission.reason}</span>
-                    ) : (
-                      <span>No reason provided</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.permission && user.permission.submitted_date ? (
-                      <span>{user.permission.submitted_date}</span>
-                    ) : (
-                      <span>No submitted date available</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-no-wrap border-none">
-                    {user.permission && user.permission.status ? (
-                      user.permission.status === "pending" ? (
-                        <div className="text-yellow-600 font-bold">
-                          Pending Approval
-                        </div>
+                    {user.status ? (
+                      user.status === "pending" ? (
+                        <div className="text-yellow-600 font-bold">Pending Approval</div>
                       ) : (
                         <div
                           className={`relative grid items-center px-2 py-1 font-sans text-xs font-bold uppercase rounded-md select-none whitespace-nowrap ${
-                            user.permission.status === "approved"
-                              ? "bg-green-200 text-green-900"
-                              : "bg-red-200 text-red-900"
+                            user.status === "approved" ? "bg-green-200 text-green-900" : "bg-red-200 text-red-900"
                           }`}
                         >
-                          <span>
-                            {user.permission.status === "approved"
-                              ? "Approved"
-                              : "Rejected"}
-                          </span>
+                          <span>{user.status === "approved" ? "Approved" : "Rejected"}</span>
                         </div>
                       )
                     ) : (

@@ -40,6 +40,8 @@ import {activityData} from "views/admin/activitylog/variables/activityData";
 import {roleData} from "views/admin/role/variables/roleData";
 import CourseManagement from "views/admin/CourseManagement/CourseManagement";
 import ScheduleManagement from "views/admin/ScheduleManagement/ScheduleManagement";
+import StudentSchedule from "views/student/Schedule/index"
+import AttendanceDashboard from "views/student/Dashboard/AttendanceDashboard";
 
 const attendanceData = [
   {
@@ -102,7 +104,7 @@ const routes = [
     layout: "/admin",
     icon: <Icon as={MdHome} width='20px' height='20px' color='inherit' />,
     path: "/student-demo",
-    component: Demopages,
+    component: AttendanceDashboard,
     allowedRoles: ["student"],
   },
   {
@@ -119,6 +121,14 @@ const routes = [
     ),
     component: Studentcourse,
     secondary: true,
+    allowedRoles: ["student"],
+  },
+  {
+    name: "Schedule",
+    layout: "/admin",
+    icon: <Icon as={MdSchedule} width='20px' height='20px' color='inherit' />,
+    path: "/schedule",
+    component: StudentSchedule,
     allowedRoles: ["student"],
   },
   {

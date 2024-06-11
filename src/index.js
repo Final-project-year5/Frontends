@@ -46,7 +46,7 @@ ReactDOM.render(
             <Route path={`/student`} component={StudentLayout} />
             <Route path={`/admin`} component={AdminLayout} />
             <Route path={`/teacher`} component={TeacherLayout} />
-            <RouteGuard path="/courses/:index" component={(props) => <ViewCoursePage {...props} tableData={tableData} students={studentData} />} allowedRoles={["teacher"]} />
+            <RouteGuard path="/courses/:id" component={(props) => <ViewCoursePage {...props} tableData={tableData} students={studentData} />} allowedRoles={["teacher"]} />
             <RouteGuard path="/attendance-history" component={AttendanceHistory} allowedRoles={["teacher"]} />
             <RouteGuard path="/detailed-report/:id" component={DetailedReport} allowedRoles={["teacher"]} />
             <RouteGuard path="/student-permission" component={StudentPermission} allowedRoles={["student"]} />
